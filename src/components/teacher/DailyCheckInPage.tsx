@@ -1,0 +1,311 @@
+import { useState } from "react";
+import { classDates, attendanceRecords, AttendanceStatus, getStatusLabel } from "@/data/dummyData";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { ArrowLeft, Play, Clock, Plus, StopCircle, FileSpreadsheet, FileText, Pencil, MessageSquare } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+
+interface DailyCheckInPageProps {
+  classDateId: string;
+  onBack: () => void;
+}
+
+export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps) {
+  const classDate = classDates.find((d) => d.id === classDateId);
+  const initialRecords = attendanceRecords.filter((r) => r.classDateId === classDateId);
+  
+  const [records, setRecords] = useState(initialRecords);
+  const [isCheckInActive, setIsCheckInActive] = useState(classDate?.isActive || false);
+  const [checkInCode, setCheckInCode] = useState(classDate?.checkInCode || "");
+  const [duration, setDuration] = useState(15);
+  const [timeRemaining, setTimeRemaining] = useState(duration * 60);
+  const [editingNote, setEditingNote] = useState<string | null>(null);
+  const [noteText, setNoteText] = useState("");
+
+  if (!classDate) return null;
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const handleStartCheckIn = () => {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    setCheckInCode(code);
+    setIsCheckInActive(true);
+    toast({
+      title: "Check-in Started",
+      description: `Check-in code: ${code}. Duration: ${duration} minutes.`,
+    });
+  };
+
+  const handleEndCheckIn = () => {
+    setIsCheckInActive(false);
+    toast({
+      title: "Check-in Ended",
+      description: "Students can no longer check in.",
+    });
+  };
+
+  const handleExtend = () => {
+    setTimeRemaining((prev) => prev + 300);
+    toast({
+      title: "Time Extended",
+      description: "Added 5 minutes to check-in duration.",
+    });
+  };
+
+  const handleStatusChange = (recordId: string, newStatus: AttendanceStatus) => {
+    setRecords((prev) =>
+      prev.map((r) =>
+        r.id === recordId ? { ...r, status: newStatus } : r
+      )
+    );
+    toast({
+      title: "Status Updated",
+      description: `Changed status to ${getStatusLabel(newStatus)}`,
+    });
+  };
+
+  const handleSaveNote = (recordId: string) => {
+    setRecords((prev) =>
+      prev.map((r) =>
+        r.id === recordId ? { ...r, note: noteText } : r
+      )
+    );
+    setEditingNote(null);
+    setNoteText("");
+    toast({ title: "Note Saved" });
+  };
+
+  const handleExport = (format: "excel" | "pdf") => {
+    toast({
+      title: `Export to ${format.toUpperCase()}`,
+      description: "Your file is being prepared for download.",
+    });
+  };
+
+  const statusCounts = {
+    present: records.filter((r) => r.status === "O").length,
+    late: records.filter((r) => r.status === "L").length,
+    absent: records.filter((r) => r.status === "X").length,
+    leave: records.filter((r) => r.status === "Y").length,
+  };
+
+  return (
+    <div className="container py-8 px-4 animate-fade-in">
+      <div className="flex items-center gap-4 mb-6">
+        <Button variant="ghost" size="icon" onClick={onBack}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div className="flex-1">
+          <h2 className="text-2xl font-bold">Daily Check-in</h2>
+          <p className="text-muted-foreground">{formatDate(classDate.date)} • {classDate.time}</p>
+        </div>
+      </div>
+
+      {/* Control Panel */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-primary" />
+              Check-in Control
+            </span>
+            {isCheckInActive && (
+              <Badge className="bg-success text-success-foreground animate-pulse">
+                Active • Code: {checkInCode}
+              </Badge>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-4">
+            {!isCheckInActive ? (
+              <>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="gap-2">
+                      <Clock className="h-4 w-4" />
+                      Set Duration
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="bg-card">
+                    <DialogHeader>
+                      <DialogTitle>Set Check-in Duration</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 pt-4">
+                      <div className="space-y-2">
+                        <Label>Duration (minutes)</Label>
+                        <Input
+                          type="number"
+                          value={duration}
+                          onChange={(e) => setDuration(Number(e.target.value))}
+                          min={5}
+                          max={60}
+                        />
+                      </div>
+                      <Button className="w-full" onClick={() => {}}>
+                        Confirm Duration
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+                <Button onClick={handleStartCheckIn} className="gap-2">
+                  <Play className="h-4 w-4" />
+                  Start Check-in
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" onClick={handleExtend} className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Extend +5 min
+                </Button>
+                <Button variant="destructive" onClick={handleEndCheckIn} className="gap-2">
+                  <StopCircle className="h-4 w-4" />
+                  End Early
+                </Button>
+              </>
+            )}
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-4 gap-4 mt-6 pt-6 border-t">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-success">{statusCounts.present}</div>
+              <div className="text-sm text-muted-foreground">Present</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-warning">{statusCounts.late}</div>
+              <div className="text-sm text-muted-foreground">Late</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-destructive">{statusCounts.absent}</div>
+              <div className="text-sm text-muted-foreground">Absent</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-info">{statusCounts.leave}</div>
+              <div className="text-sm text-muted-foreground">Leave</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Attendance Table */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Attendance Records</CardTitle>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => handleExport("excel")} className="gap-2">
+                <FileSpreadsheet className="h-4 w-4" />
+                Export Excel
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => handleExport("pdf")} className="gap-2">
+                <FileText className="h-4 w-4" />
+                Export PDF
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow className="table-header">
+                <TableHead className="w-12">#</TableHead>
+                <TableHead>Student Code</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Time</TableHead>
+                <TableHead>Drop/Withdraw</TableHead>
+                <TableHead>Edit</TableHead>
+                <TableHead>Note</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {records.map((record, index) => (
+                <TableRow key={record.id} className="table-row-hover">
+                  <TableCell className="font-medium">{index + 1}</TableCell>
+                  <TableCell>{record.studentCode}</TableCell>
+                  <TableCell>{record.studentName}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={record.status} showLabel />
+                  </TableCell>
+                  <TableCell>{record.checkInTime || "-"}</TableCell>
+                  <TableCell>
+                    {record.isDropped ? (
+                      <Badge variant="secondary">Dropped</Badge>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Select
+                      value={record.status}
+                      onValueChange={(value) => handleStatusChange(record.id, value as AttendanceStatus)}
+                    >
+                      <SelectTrigger className="w-28 h-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover">
+                        <SelectItem value="O">Present (O)</SelectItem>
+                        <SelectItem value="L">Late (L)</SelectItem>
+                        <SelectItem value="X">Absent (X)</SelectItem>
+                        <SelectItem value="Y">Leave (Y)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell>
+                    {editingNote === record.id ? (
+                      <div className="flex gap-2">
+                        <Input
+                          value={noteText}
+                          onChange={(e) => setNoteText(e.target.value)}
+                          className="h-8 w-32"
+                          placeholder="Enter note..."
+                        />
+                        <Button size="sm" variant="ghost" onClick={() => handleSaveNote(record.id)}>
+                          Save
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground truncate max-w-24">
+                          {record.note || "-"}
+                        </span>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-6 w-6"
+                          onClick={() => {
+                            setEditingNote(record.id);
+                            setNoteText(record.note);
+                          }}
+                        >
+                          <MessageSquare className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

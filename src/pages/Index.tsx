@@ -1,13 +1,41 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { Header } from "@/components/layout/Header";
+import { UserRole } from "@/components/layout/RoleSwitcher";
+import { TeacherDashboard } from "@/components/teacher/TeacherDashboard";
+import { StudentDashboard } from "@/components/student/StudentDashboard";
+import { AdminDashboard } from "@/components/admin/AdminDashboard";
+import { Helmet } from "react-helmet-async";
 
 const Index = () => {
+  const [currentRole, setCurrentRole] = useState<UserRole>("teacher");
+
+  const renderDashboard = () => {
+    switch (currentRole) {
+      case "teacher":
+        return <TeacherDashboard />;
+      case "student":
+        return <StudentDashboard />;
+      case "admin":
+        return <AdminDashboard />;
+      default:
+        return <TeacherDashboard />;
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <>
+      <Helmet>
+        <title>CS&IT Attendance System | University Department</title>
+        <meta
+          name="description"
+          content="Student attendance management system for Computer Science and IT Department. Manage check-ins, view reports, and track attendance."
+        />
+      </Helmet>
+      <div className="min-h-screen bg-background">
+        <Header currentRole={currentRole} onRoleChange={setCurrentRole} />
+        {renderDashboard()}
       </div>
-    </div>
+    </>
   );
 };
 
