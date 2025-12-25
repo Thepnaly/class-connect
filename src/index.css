@@ -131,6 +131,14 @@
     @apply bg-info/10 text-info border-info/20;
   }
 
+  .status-dropped {
+    @apply bg-black text-white border-white/50;
+  }
+
+  .status-withdrawn {
+    @apply bg-destructive text-white border-destructive;
+  }
+
   .card-hover {
     @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
   }
