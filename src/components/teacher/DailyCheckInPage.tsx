@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { classDates, attendanceRecords, AttendanceStatus, getStatusLabel } from "@/data/dummyData";
+import { classDates, attendanceRecords, AttendanceStatus, getStatusLabel, getRowClass } from "@/data/dummyData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -102,6 +102,8 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
     late: records.filter((r) => r.status === "L").length,
     absent: records.filter((r) => r.status === "X").length,
     leave: records.filter((r) => r.status === "Y").length,
+    dropped: records.filter((r) => r.status === "Drop").length,
+    withdrawn: records.filter((r) => r.status === "W").length,
   };
 
   return (
@@ -183,7 +185,7 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-4 gap-4 mt-6 pt-6 border-t">
+          <div className="grid grid-cols-6 gap-4 mt-6 pt-6 border-t">
             <div className="text-center">
               <div className="text-2xl font-bold text-success">{statusCounts.present}</div>
               <div className="text-sm text-muted-foreground">Present</div>
@@ -199,6 +201,14 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
             <div className="text-center">
               <div className="text-2xl font-bold text-info">{statusCounts.leave}</div>
               <div className="text-sm text-muted-foreground">Leave</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-foreground">{statusCounts.dropped}</div>
+              <div className="text-sm text-muted-foreground">Dropped</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-red-500">{statusCounts.withdrawn}</div>
+              <div className="text-sm text-muted-foreground">Withdrawn</div>
             </div>
           </div>
         </CardContent>
@@ -236,72 +246,81 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
               </TableRow>
             </TableHeader>
             <TableBody>
-              {records.map((record, index) => (
-                <TableRow key={record.id} className="table-row-hover">
-                  <TableCell className="font-medium">{index + 1}</TableCell>
-                  <TableCell>{record.studentCode}</TableCell>
-                  <TableCell>{record.studentName}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={record.status} showLabel />
-                  </TableCell>
-                  <TableCell>{record.checkInTime || "-"}</TableCell>
-                  <TableCell>
-                    {record.isDropped ? (
-                      <Badge variant="secondary">Dropped</Badge>
-                    ) : (
-                      <span className="text-muted-foreground">-</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Select
-                      value={record.status}
-                      onValueChange={(value) => handleStatusChange(record.id, value as AttendanceStatus)}
-                    >
-                      <SelectTrigger className="w-28 h-8">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover">
-                        <SelectItem value="O">Present (O)</SelectItem>
-                        <SelectItem value="L">Late (L)</SelectItem>
-                        <SelectItem value="X">Absent (X)</SelectItem>
-                        <SelectItem value="Y">Leave (Y)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    {editingNote === record.id ? (
-                      <div className="flex gap-2">
-                        <Input
-                          value={noteText}
-                          onChange={(e) => setNoteText(e.target.value)}
-                          className="h-8 w-32"
-                          placeholder="Enter note..."
-                        />
-                        <Button size="sm" variant="ghost" onClick={() => handleSaveNote(record.id)}>
-                          Save
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground truncate max-w-24">
-                          {record.note || "-"}
-                        </span>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-6 w-6"
-                          onClick={() => {
-                            setEditingNote(record.id);
-                            setNoteText(record.note);
-                          }}
-                        >
-                          <MessageSquare className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
+              {records.map((record, index) => {
+                const rowClass = getRowClass(record.status);
+                const isSpecialStatus = record.status === 'Drop' || record.status === 'W';
+                
+                return (
+                  <TableRow key={record.id} className={`table-row-hover ${rowClass}`}>
+                    <TableCell className={`font-medium ${isSpecialStatus ? 'text-white' : ''}`}>{index + 1}</TableCell>
+                    <TableCell className={isSpecialStatus ? 'text-white' : ''}>{record.studentCode}</TableCell>
+                    <TableCell className={isSpecialStatus ? 'text-white' : ''}>{record.studentName}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={record.status} showLabel />
+                    </TableCell>
+                    <TableCell className={isSpecialStatus ? 'text-white' : ''}>{record.checkInTime || "-"}</TableCell>
+                    <TableCell>
+                      {record.status === 'Drop' ? (
+                        <Badge className="bg-black text-white border-white">Dropped</Badge>
+                      ) : record.status === 'W' ? (
+                        <Badge className="bg-destructive text-white">Withdrawn</Badge>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Select
+                        value={record.status}
+                        onValueChange={(value) => handleStatusChange(record.id, value as AttendanceStatus)}
+                      >
+                        <SelectTrigger className={`w-32 h-8 ${isSpecialStatus ? 'bg-white/20 border-white/50 text-white' : ''}`}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover">
+                          <SelectItem value="O">Present (O)</SelectItem>
+                          <SelectItem value="L">Late (L)</SelectItem>
+                          <SelectItem value="X">Absent (X)</SelectItem>
+                          <SelectItem value="Y">Leave (Y)</SelectItem>
+                          <SelectItem value="Drop">Dropped (Drop)</SelectItem>
+                          <SelectItem value="W">Withdrawn (W)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      {editingNote === record.id ? (
+                        <div className="flex gap-2">
+                          <Input
+                            value={noteText}
+                            onChange={(e) => setNoteText(e.target.value)}
+                            className="h-8 w-32"
+                            placeholder="Enter note..."
+                          />
+                          <Button size="sm" variant="ghost" onClick={() => handleSaveNote(record.id)}>
+                            Save
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className={`text-sm truncate max-w-24 ${isSpecialStatus ? 'text-white/80' : 'text-muted-foreground'}`}>
+                            {record.note || "-"}
+                          </span>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className={`h-6 w-6 ${isSpecialStatus ? 'text-white hover:bg-white/20' : ''}`}
+                            onClick={() => {
+                              setEditingNote(record.id);
+                              setNoteText(record.note);
+                            }}
+                          >
+                            <MessageSquare className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>

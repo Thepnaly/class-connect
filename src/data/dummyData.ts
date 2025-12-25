@@ -1,6 +1,6 @@
 // Dummy data for the attendance system
 
-export type AttendanceStatus = 'O' | 'L' | 'X' | 'Y';
+export type AttendanceStatus = 'O' | 'L' | 'X' | 'Y' | 'Drop' | 'W';
 
 export interface Student {
   id: string;
@@ -105,7 +105,8 @@ export const attendanceRecords: AttendanceRecord[] = [
   { id: '7', studentId: '7', studentCode: '65070007', studentName: 'Napat Vejchapipat', classDateId: '1', status: 'Y', isDropped: false, note: 'Medical leave' },
   { id: '8', studentId: '8', studentCode: '65070008', studentName: 'Kanya Rattanakul', classDateId: '1', status: 'O', checkInTime: '09:00', isDropped: false, note: '' },
   { id: '9', studentId: '9', studentCode: '65070009', studentName: 'Thawee Somjai', classDateId: '1', status: 'L', checkInTime: '09:18', isDropped: false, note: '' },
-  { id: '10', studentId: '10', studentCode: '65070010', studentName: 'Arisa Petcharat', classDateId: '1', status: 'O', checkInTime: '09:01', isDropped: true, note: 'Dropped course' },
+  { id: '10', studentId: '10', studentCode: '65070010', studentName: 'Arisa Petcharat', classDateId: '1', status: 'Drop', checkInTime: '', isDropped: true, note: 'Dropped course' },
+  { id: '10b', studentId: '11', studentCode: '65070011', studentName: 'Wichai Somphong', classDateId: '1', status: 'W', checkInTime: '', isDropped: false, note: 'Withdrawn from university' },
 
   // Class Date 2 (Dec 9)
   { id: '11', studentId: '1', studentCode: '65070001', studentName: 'Somchai Prasert', classDateId: '2', status: 'O', checkInTime: '09:00', isDropped: false, note: '' },
@@ -137,6 +138,8 @@ export const getStatusLabel = (status: AttendanceStatus): string => {
     case 'L': return 'Late';
     case 'X': return 'Absent';
     case 'Y': return 'Leave';
+    case 'Drop': return 'Dropped';
+    case 'W': return 'Withdrawn';
   }
 };
 
@@ -146,6 +149,16 @@ export const getStatusClass = (status: AttendanceStatus): string => {
     case 'L': return 'status-late';
     case 'X': return 'status-absent';
     case 'Y': return 'status-leave';
+    case 'Drop': return 'status-dropped';
+    case 'W': return 'status-withdrawn';
+  }
+};
+
+export const getRowClass = (status: AttendanceStatus): string => {
+  switch (status) {
+    case 'Drop': return 'bg-black text-white';
+    case 'W': return 'bg-destructive text-white';
+    default: return '';
   }
 };
 
