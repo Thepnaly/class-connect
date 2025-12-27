@@ -3,34 +3,72 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { attendanceRecords, students, courses, classDates } from "@/data/dummyData";
-import { Calendar, FileSpreadsheet, FileText, Eye, Users, User, Building2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { attendanceRecords, students, courses, classDates, teachers } from "@/data/dummyData";
+import { Calendar, FileSpreadsheet, FileText, Eye, Users, User, Building2, BookOpen, AlertTriangle, GraduationCap, PieChart } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { PieChart as RechartsPC, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+
+// Mock data for instructor teaching log
+const instructorTeachingLog = [
+  { id: "1", name: "Dr. Piyawat Lertsithichai", department: "Computer Science", sessionsTaught: 22, totalRequired: 24, percentage: 92 },
+  { id: "2", name: "Assoc. Prof. Waraporn Narongrit", department: "IT", sessionsTaught: 24, totalRequired: 24, percentage: 100 },
+  { id: "3", name: "Dr. Chaiwat Suttipong", department: "Computer Science", sessionsTaught: 20, totalRequired: 24, percentage: 83 },
+];
+
+// Mock data for student status report
+const studentStatusData = [
+  { id: "1", studentCode: "65070001", name: "Somchai Prasert", gender: "Male", classNum: 1, status: "Active" },
+  { id: "2", studentCode: "65070002", name: "Narong Tanaka", gender: "Male", classNum: 1, status: "Active" },
+  { id: "3", studentCode: "65070003", name: "Pranee Wongsiri", gender: "Female", classNum: 1, status: "Active" },
+  { id: "4", studentCode: "65070004", name: "Supachai Khunpol", gender: "Male", classNum: 2, status: "Active" },
+  { id: "5", studentCode: "65070005", name: "Wilai Charoen", gender: "Female", classNum: 2, status: "On-Leave" },
+  { id: "6", studentCode: "65070006", name: "Prasit Suksawat", gender: "Male", classNum: 1, status: "Active" },
+  { id: "7", studentCode: "65070007", name: "Napat Vejchapipat", gender: "Male", classNum: 2, status: "Active" },
+  { id: "8", studentCode: "65070008", name: "Kanya Rattanakul", gender: "Female", classNum: 1, status: "Active" },
+  { id: "9", studentCode: "65070009", name: "Thawee Somjai", gender: "Male", classNum: 2, status: "Dropped" },
+  { id: "10", studentCode: "65070010", name: "Arisa Petcharat", gender: "Female", classNum: 2, status: "Active" },
+];
+
+// Mock data for at-risk students
+const atRiskStudents = [
+  { id: "5", studentCode: "65070005", name: "Wilai Charoen", course: "CS301 - Data Structures", absences: 5, percentage: 58 },
+  { id: "9", studentCode: "65070009", name: "Thawee Somjai", course: "CS301 - Data Structures", absences: 6, percentage: 50 },
+  { id: "4", studentCode: "65070004", name: "Supachai Khunpol", course: "IT301 - Web Dev", absences: 5, percentage: 58 },
+];
+
+// Mock data for department overview pie chart
+const departmentAttendanceData = [
+  { name: "Present", value: 78, color: "hsl(var(--success))" },
+  { name: "Late", value: 12, color: "hsl(var(--warning))" },
+  { name: "Absent", value: 8, color: "hsl(var(--destructive))" },
+  { name: "Leave", value: 2, color: "hsl(var(--info))" },
+];
 
 const reports = [
   {
-    id: "daily",
-    title: "Daily Attendance Report",
-    description: "View and export attendance data for a specific day",
-    icon: Calendar,
+    id: "instructor",
+    title: "Instructor Teaching Log",
+    description: "Sessions taught by each teacher vs. total required",
+    icon: GraduationCap,
   },
   {
-    id: "term",
-    title: "Term Summary / Single Course",
-    description: "Comprehensive attendance summary for a course or semester",
+    id: "student-status",
+    title: "Student Status Report",
+    description: "Student ID, Name, Gender, Class, and Status summary",
     icon: Users,
   },
   {
-    id: "student",
-    title: "Individual Student History",
-    description: "Complete attendance history for a specific student",
-    icon: User,
+    id: "at-risk",
+    title: "At-Risk Report (Risk Watch)",
+    description: "Students with more than 4 absences in any subject",
+    icon: AlertTriangle,
   },
   {
-    id: "schoolwide",
-    title: "School-wide Summary",
-    description: "Overview of attendance across all departments",
-    icon: Building2,
+    id: "department",
+    title: "Department Overview",
+    description: "CEIT department-wide attendance with charts",
+    icon: PieChart,
   },
 ];
 
@@ -42,19 +80,26 @@ export function AdminReports() {
     });
   };
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-    });
+  // Calculate gender/class counts
+  const class1Male = studentStatusData.filter(s => s.classNum === 1 && s.gender === "Male").length;
+  const class1Female = studentStatusData.filter(s => s.classNum === 1 && s.gender === "Female").length;
+  const class2Male = studentStatusData.filter(s => s.classNum === 2 && s.gender === "Male").length;
+  const class2Female = studentStatusData.filter(s => s.classNum === 2 && s.gender === "Female").length;
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case "Active": return "default";
+      case "Dropped": return "destructive";
+      case "On-Leave": return "secondary";
+      default: return "outline";
+    }
   };
 
   return (
     <div className="p-8 animate-fade-in">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-foreground">Reports</h2>
-        <p className="text-muted-foreground mt-1">Generate and export attendance reports</p>
+        <h2 className="text-3xl font-bold text-foreground">Academic Reports</h2>
+        <p className="text-muted-foreground mt-1">CEIT Department Report Center</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -64,8 +109,12 @@ export function AdminReports() {
             <Card key={report.id} className="card-hover">
               <CardHeader>
                 <div className="flex items-start gap-4">
-                  <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    <Icon className="h-6 w-6 text-primary" />
+                  <div className={`h-12 w-12 rounded-lg flex items-center justify-center shrink-0 ${
+                    report.id === "at-risk" ? "bg-destructive/10" : "bg-primary/10"
+                  }`}>
+                    <Icon className={`h-6 w-6 ${
+                      report.id === "at-risk" ? "text-destructive" : "text-primary"
+                    }`} />
                   </div>
                   <div>
                     <CardTitle className="text-lg">{report.title}</CardTitle>
@@ -82,77 +131,87 @@ export function AdminReports() {
                         View
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-card max-w-4xl max-h-[80vh] overflow-y-auto">
+                    <DialogContent className="bg-card max-w-5xl max-h-[85vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle>{report.title}</DialogTitle>
-                        <DialogDescription>Preview of report data</DialogDescription>
+                        <DialogDescription>Semester 2/2024 - CEIT Department</DialogDescription>
                       </DialogHeader>
                       <div className="pt-4">
-                        {report.id === "daily" && (
+                        {/* Instructor Teaching Log */}
+                        {report.id === "instructor" && (
                           <Table>
                             <TableHeader>
                               <TableRow className="table-header">
-                                <TableHead>Student Code</TableHead>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Course</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Time</TableHead>
+                                <TableHead>Instructor Name</TableHead>
+                                <TableHead>Department</TableHead>
+                                <TableHead className="text-center">Sessions Taught</TableHead>
+                                <TableHead className="text-center">Total Required</TableHead>
+                                <TableHead className="text-center">Completion %</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {attendanceRecords.slice(0, 8).map((record) => (
-                                <TableRow key={record.id}>
-                                  <TableCell>{record.studentCode}</TableCell>
-                                  <TableCell>{record.studentName}</TableCell>
-                                  <TableCell>CS301</TableCell>
-                                  <TableCell>
-                                    <StatusBadge status={record.status} showLabel />
+                              {instructorTeachingLog.map((instructor) => (
+                                <TableRow key={instructor.id}>
+                                  <TableCell className="font-medium">{instructor.name}</TableCell>
+                                  <TableCell>{instructor.department}</TableCell>
+                                  <TableCell className="text-center">{instructor.sessionsTaught}</TableCell>
+                                  <TableCell className="text-center">{instructor.totalRequired}</TableCell>
+                                  <TableCell className="text-center">
+                                    <span className={`font-semibold ${
+                                      instructor.percentage >= 90 ? 'text-success' :
+                                      instructor.percentage >= 75 ? 'text-warning' : 'text-destructive'
+                                    }`}>
+                                      {instructor.percentage}%
+                                    </span>
                                   </TableCell>
-                                  <TableCell>{record.checkInTime || "-"}</TableCell>
                                 </TableRow>
                               ))}
                             </TableBody>
                           </Table>
                         )}
-                        {report.id === "term" && (
+
+                        {/* Student Status Report */}
+                        {report.id === "student-status" && (
                           <div className="space-y-4">
-                            <div className="flex gap-4 text-sm">
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold">Course:</span>
-                                <span>CS301 - Data Structures</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold">Semester:</span>
-                                <span>2/2024</span>
-                              </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <Card className="p-4">
+                                <p className="text-sm font-medium mb-2">Class 1 Summary</p>
+                                <div className="flex gap-4 text-sm">
+                                  <span>Male: <strong>{class1Male}</strong></span>
+                                  <span>Female: <strong>{class1Female}</strong></span>
+                                  <span>Total: <strong>{class1Male + class1Female}</strong></span>
+                                </div>
+                              </Card>
+                              <Card className="p-4">
+                                <p className="text-sm font-medium mb-2">Class 2 Summary</p>
+                                <div className="flex gap-4 text-sm">
+                                  <span>Male: <strong>{class2Male}</strong></span>
+                                  <span>Female: <strong>{class2Female}</strong></span>
+                                  <span>Total: <strong>{class2Male + class2Female}</strong></span>
+                                </div>
+                              </Card>
                             </div>
                             <Table>
                               <TableHeader>
                                 <TableRow className="table-header">
-                                  <TableHead>Student</TableHead>
-                                  {classDates.slice(0, 3).map((d) => (
-                                    <TableHead key={d.id} className="text-center">
-                                      {formatDate(d.date)}
-                                    </TableHead>
-                                  ))}
-                                  <TableHead className="text-center">Total</TableHead>
+                                  <TableHead>Student ID</TableHead>
+                                  <TableHead>Name</TableHead>
+                                  <TableHead className="text-center">Gender</TableHead>
+                                  <TableHead className="text-center">Class</TableHead>
+                                  <TableHead className="text-center">Status</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
-                                {students.slice(0, 5).map((student) => (
+                                {studentStatusData.map((student) => (
                                   <TableRow key={student.id}>
-                                    <TableCell>{student.name}</TableCell>
+                                    <TableCell>{student.studentCode}</TableCell>
+                                    <TableCell className="font-medium">{student.name}</TableCell>
+                                    <TableCell className="text-center">{student.gender}</TableCell>
+                                    <TableCell className="text-center">{student.classNum}</TableCell>
                                     <TableCell className="text-center">
-                                      <StatusBadge status="O" />
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                      <StatusBadge status="L" />
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                      <StatusBadge status="O" />
-                                    </TableCell>
-                                    <TableCell className="text-center font-semibold">
-                                      2/3
+                                      <Badge variant={getStatusBadgeVariant(student.status)}>
+                                        {student.status}
+                                      </Badge>
                                     </TableCell>
                                   </TableRow>
                                 ))}
@@ -160,76 +219,120 @@ export function AdminReports() {
                             </Table>
                           </div>
                         )}
-                        {report.id === "student" && (
+
+                        {/* At-Risk Report */}
+                        {report.id === "at-risk" && (
                           <div className="space-y-4">
-                            <div className="flex gap-4 text-sm">
-                              <span className="font-semibold">Student:</span>
-                              <span>65070001 - Somchai Prasert</span>
+                            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+                              <div className="flex items-center gap-2 text-destructive">
+                                <AlertTriangle className="h-5 w-5" />
+                                <span className="font-semibold">{atRiskStudents.length} students at risk</span>
+                              </div>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Students with more than 4 absences in any subject
+                              </p>
                             </div>
                             <Table>
                               <TableHeader>
                                 <TableRow className="table-header">
-                                  <TableHead>Date</TableHead>
+                                  <TableHead>Student ID</TableHead>
+                                  <TableHead>Name</TableHead>
                                   <TableHead>Course</TableHead>
-                                  <TableHead>Status</TableHead>
-                                  <TableHead>Check-in Time</TableHead>
+                                  <TableHead className="text-center">Absences</TableHead>
+                                  <TableHead className="text-center">Attendance %</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
-                                {attendanceRecords
-                                  .filter((r) => r.studentId === "1")
-                                  .map((record) => {
-                                    const classDate = classDates.find(
-                                      (d) => d.id === record.classDateId
-                                    );
-                                    return (
-                                      <TableRow key={record.id}>
-                                        <TableCell>
-                                          {classDate ? formatDate(classDate.date) : "-"}
-                                        </TableCell>
-                                        <TableCell>CS301</TableCell>
-                                        <TableCell>
-                                          <StatusBadge status={record.status} showLabel />
-                                        </TableCell>
-                                        <TableCell>{record.checkInTime || "-"}</TableCell>
-                                      </TableRow>
-                                    );
-                                  })}
+                                {atRiskStudents.map((student) => (
+                                  <TableRow key={student.id} className="bg-destructive/5">
+                                    <TableCell>{student.studentCode}</TableCell>
+                                    <TableCell className="font-medium">{student.name}</TableCell>
+                                    <TableCell>{student.course}</TableCell>
+                                    <TableCell className="text-center">
+                                      <Badge variant="destructive">{student.absences}</Badge>
+                                    </TableCell>
+                                    <TableCell className="text-center text-destructive font-semibold">
+                                      {student.percentage}%
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
                               </TableBody>
                             </Table>
                           </div>
                         )}
-                        {report.id === "schoolwide" && (
-                          <Table>
-                            <TableHeader>
-                              <TableRow className="table-header">
-                                <TableHead>Department</TableHead>
-                                <TableHead className="text-center">Total Students</TableHead>
-                                <TableHead className="text-center">Present</TableHead>
-                                <TableHead className="text-center">Late</TableHead>
-                                <TableHead className="text-center">Absent</TableHead>
-                                <TableHead className="text-center">Attendance Rate</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              <TableRow>
-                                <TableCell className="font-medium">Computer Science</TableCell>
-                                <TableCell className="text-center">120</TableCell>
-                                <TableCell className="text-center text-success">102</TableCell>
-                                <TableCell className="text-center text-warning">8</TableCell>
-                                <TableCell className="text-center text-destructive">10</TableCell>
-                                <TableCell className="text-center font-semibold">91.7%</TableCell>
-                              </TableRow>
-                              <TableRow>
-                                <TableCell className="font-medium">Information Technology</TableCell>
-                                <TableCell className="text-center">85</TableCell>
-                                <TableCell className="text-center text-success">70</TableCell>
-                                <TableCell className="text-center text-warning">10</TableCell>
-                                <TableCell className="text-center text-destructive">5</TableCell>
-                                <TableCell className="text-center font-semibold">94.1%</TableCell>
-                              </TableRow>
-                            </TableBody>
-                          </Table>
+
+                        {/* Department Overview */}
+                        {report.id === "department" && (
+                          <div className="space-y-6">
+                            <div className="grid grid-cols-2 gap-6">
+                              <Card className="p-4">
+                                <h4 className="font-semibold mb-4">CEIT Department Attendance Distribution</h4>
+                                <div className="h-64">
+                                  <ResponsiveContainer width="100%" height="100%">
+                                    <RechartsPC>
+                                      <Pie
+                                        data={departmentAttendanceData}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={50}
+                                        outerRadius={80}
+                                        paddingAngle={2}
+                                        dataKey="value"
+                                        label={({ name, value }) => `${name}: ${value}%`}
+                                      >
+                                        {departmentAttendanceData.map((entry, index) => (
+                                          <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                      </Pie>
+                                      <Tooltip />
+                                    </RechartsPC>
+                                  </ResponsiveContainer>
+                                </div>
+                              </Card>
+                              <Card className="p-4">
+                                <h4 className="font-semibold mb-4">Summary Statistics</h4>
+                                <div className="space-y-3">
+                                  <div className="flex justify-between p-3 bg-success/10 rounded-lg">
+                                    <span>Present Rate</span>
+                                    <span className="font-bold text-success">78%</span>
+                                  </div>
+                                  <div className="flex justify-between p-3 bg-warning/10 rounded-lg">
+                                    <span>Late Rate</span>
+                                    <span className="font-bold text-warning">12%</span>
+                                  </div>
+                                  <div className="flex justify-between p-3 bg-destructive/10 rounded-lg">
+                                    <span>Absent Rate</span>
+                                    <span className="font-bold text-destructive">8%</span>
+                                  </div>
+                                  <div className="flex justify-between p-3 bg-info/10 rounded-lg">
+                                    <span>Leave Rate</span>
+                                    <span className="font-bold text-info">2%</span>
+                                  </div>
+                                </div>
+                              </Card>
+                            </div>
+                            <Card className="p-4">
+                              <h4 className="font-semibold mb-4">Department Totals</h4>
+                              <div className="grid grid-cols-4 gap-4 text-center">
+                                <div className="p-4 bg-muted/30 rounded-lg">
+                                  <p className="text-2xl font-bold">205</p>
+                                  <p className="text-sm text-muted-foreground">Total Students</p>
+                                </div>
+                                <div className="p-4 bg-muted/30 rounded-lg">
+                                  <p className="text-2xl font-bold">12</p>
+                                  <p className="text-sm text-muted-foreground">Total Courses</p>
+                                </div>
+                                <div className="p-4 bg-muted/30 rounded-lg">
+                                  <p className="text-2xl font-bold">8</p>
+                                  <p className="text-sm text-muted-foreground">Total Instructors</p>
+                                </div>
+                                <div className="p-4 bg-muted/30 rounded-lg">
+                                  <p className="text-2xl font-bold text-success">87%</p>
+                                  <p className="text-sm text-muted-foreground">Overall Attendance</p>
+                                </div>
+                              </div>
+                            </Card>
+                          </div>
                         )}
                       </div>
                     </DialogContent>

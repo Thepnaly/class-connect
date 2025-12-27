@@ -6,6 +6,8 @@ import { BookOpen, Calendar, Users, Clock } from "lucide-react";
 import { ClassDatesPage } from "./ClassDatesPage";
 import { DailyCheckInPage } from "./DailyCheckInPage";
 import { SemesterSummaryPage } from "./SemesterSummaryPage";
+import { AIRecognitionWidget } from "./AIRecognitionWidget";
+import { TeacherSummaryCard } from "./TeacherSummaryCard";
 
 type TeacherView = "dashboard" | "classDates" | "checkIn" | "summary";
 
@@ -56,102 +58,135 @@ export function TeacherDashboard() {
         <p className="text-muted-foreground mt-1">Manage your courses and student attendance</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4 mb-8">
-        <Card className="stat-card card-hover">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">My Courses</p>
-                <p className="text-3xl font-bold">{teacherCourses.length}</p>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Main Content - 3 columns */}
+        <div className="lg:col-span-3 space-y-6">
+          {/* Context Banner */}
+          <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/20">
+            <CardContent className="py-4">
+              <div className="flex items-center gap-4 text-sm">
+                <span className="font-semibold text-primary">Current Context:</span>
+                <span className="text-foreground">Course: Data Structures</span>
+                <span className="text-muted-foreground">|</span>
+                <span className="text-foreground">Section: 4COM2</span>
+                <span className="text-muted-foreground">|</span>
+                <span className="text-foreground">Room: 301</span>
               </div>
-              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <BookOpen className="h-6 w-6 text-primary" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        <Card className="stat-card card-hover">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Students</p>
-                <p className="text-3xl font-bold">42</p>
-              </div>
-              <div className="h-12 w-12 rounded-lg bg-success/10 flex items-center justify-center">
-                <Users className="h-6 w-6 text-success" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="stat-card card-hover">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Classes Today</p>
-                <p className="text-3xl font-bold">1</p>
-              </div>
-              <div className="h-12 w-12 rounded-lg bg-warning/10 flex items-center justify-center">
-                <Calendar className="h-6 w-6 text-warning" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="stat-card card-hover">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Avg. Attendance</p>
-                <p className="text-3xl font-bold">87%</p>
-              </div>
-              <div className="h-12 w-12 rounded-lg bg-info/10 flex items-center justify-center">
-                <Clock className="h-6 w-6 text-info" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Courses */}
-      <div>
-        <h3 className="text-xl font-semibold mb-4">My Courses</h3>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {teacherCourses.map((course) => (
-            <Card key={course.id} className="card-hover">
-              <CardHeader>
-                <div className="flex items-start justify-between">
+          {/* Stats */}
+          <div className="grid gap-4 md:grid-cols-4">
+            <Card className="stat-card card-hover">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg">{course.courseCode}</CardTitle>
-                    <CardDescription className="mt-1">{course.courseName}</CardDescription>
+                    <p className="text-sm text-muted-foreground">My Courses</p>
+                    <p className="text-3xl font-bold">{teacherCourses.length}</p>
                   </div>
-                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-                    {course.credits} Credits
-                  </span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm text-muted-foreground mb-4">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    <span>{course.schedule}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4" />
-                    <span>Semester {course.semester}</span>
+                  <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <BookOpen className="h-6 w-6 text-primary" />
                   </div>
                 </div>
-                <Button
-                  className="w-full"
-                  onClick={() => setViewState({ view: "classDates", courseId: course.id })}
-                >
-                  View Class Dates
-                </Button>
               </CardContent>
             </Card>
-          ))}
+
+            <Card className="stat-card card-hover">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Students</p>
+                    <p className="text-3xl font-bold">42</p>
+                  </div>
+                  <div className="h-12 w-12 rounded-lg bg-success/10 flex items-center justify-center">
+                    <Users className="h-6 w-6 text-success" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="stat-card card-hover">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Classes Today</p>
+                    <p className="text-3xl font-bold">1</p>
+                  </div>
+                  <div className="h-12 w-12 rounded-lg bg-warning/10 flex items-center justify-center">
+                    <Calendar className="h-6 w-6 text-warning" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="stat-card card-hover">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Avg. Attendance</p>
+                    <p className="text-3xl font-bold">87%</p>
+                  </div>
+                  <div className="h-12 w-12 rounded-lg bg-info/10 flex items-center justify-center">
+                    <Clock className="h-6 w-6 text-info" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Courses */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4">My Courses</h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              {teacherCourses.map((course) => (
+                <Card key={course.id} className="card-hover">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-lg">{course.courseCode}</CardTitle>
+                        <CardDescription className="mt-1">{course.courseName}</CardDescription>
+                      </div>
+                      <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                        {course.credits} Credits
+                      </span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2 text-sm text-muted-foreground mb-4">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        <span>{course.schedule}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <BookOpen className="h-4 w-4" />
+                        <span>Semester {course.semester}</span>
+                      </div>
+                    </div>
+                    <Button
+                      className="w-full"
+                      onClick={() => setViewState({ view: "classDates", courseId: course.id })}
+                    >
+                      View Class Dates
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Sidebar - 1 column */}
+        <div className="space-y-6">
+          <AIRecognitionWidget 
+            courseName="Data Structures" 
+            section="4COM2" 
+            room="301" 
+          />
+          <TeacherSummaryCard 
+            totalClasses={24}
+            avgAttendance={87}
+            atRiskStudents={3}
+          />
         </div>
       </div>
     </div>
