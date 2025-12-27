@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Calendar, CheckCircle2, History, Clock, AlertCircle, Scan, Sparkles } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { BookOpen, Calendar, CheckCircle2, History, Clock, AlertCircle, Scan, Sparkles, User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 // Mock schedule with time ranges
@@ -16,6 +17,13 @@ const courseSchedules = [
   { courseId: "1", day: "Monday", startHour: 9, endHour: 12, section: "4COM1" },
   { courseId: "3", day: "Tuesday", startHour: 9, endHour: 12, section: "4COM1" },
   { courseId: "4", day: "Thursday", startHour: 13, endHour: 16, section: "4COM1" },
+];
+
+// Mock attendance progress per course
+const courseAttendanceProgress = [
+  { courseId: "1", courseName: "Data Structures and Algorithms", courseCode: "CS301", present: 10, total: 12, percentage: 83 },
+  { courseId: "3", courseName: "Web Application Development", courseCode: "IT301", present: 11, total: 12, percentage: 92 },
+  { courseId: "4", courseName: "Software Engineering", courseCode: "CS401", present: 12, total: 12, percentage: 100 },
 ];
 
 const getDayName = () => {
@@ -125,15 +133,33 @@ export function StudentDashboard() {
     leave: studentRecords.filter((r) => r.status === "Y").length,
   };
 
+  const getProgressColor = (percentage: number) => {
+    if (percentage >= 90) return "bg-success";
+    if (percentage >= 75) return "bg-warning";
+    return "bg-destructive";
+  };
+
   return (
     <div className="container py-8 px-4 animate-fade-in">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-foreground">Welcome, {student.name}</h2>
-        <p className="text-muted-foreground mt-1">
-          {student.studentCode} • {student.department} • Year {student.year}
-        </p>
-      </div>
-
+      {/* Profile Card */}
+      <Card className="mb-6 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/20">
+        <CardContent className="py-4">
+          <div className="flex items-center gap-4">
+            <div className="h-14 w-14 rounded-full bg-primary/20 flex items-center justify-center">
+              <User className="h-7 w-7 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">{student.name}</h2>
+              <p className="text-muted-foreground">
+                {student.studentCode} • Gear {student.year} - Class 2
+              </p>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Computer Engineering and Information Technology Department
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       {/* AI Recognition Status Banner */}
       <div className="mb-6">
         {showAiAnimation && !aiCheckInSuccess && (
