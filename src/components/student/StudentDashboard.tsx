@@ -154,7 +154,7 @@ export function StudentDashboard() {
                 {student.studentCode} • Year {student.year} - Class 2
               </p>
               <p className="text-sm text-muted-foreground mt-0.5">
-                Computer Engineering and Information Technology Department
+                Major: Computer Engineering
               </p>
             </div>
           </div>
