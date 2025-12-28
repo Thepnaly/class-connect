@@ -138,13 +138,17 @@ export function TeacherDashboard() {
           <div>
             <h3 className="text-xl font-semibold mb-4">My Courses</h3>
             <div className="grid gap-4 md:grid-cols-2">
-              {teacherCourses.map((course) => (
+              {teacherCourses.map((course, index) => (
                 <Card key={course.id} className="card-hover">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-lg">{course.courseCode}</CardTitle>
                         <CardDescription className="mt-1">{course.courseName}</CardDescription>
+                        <div className="flex gap-2 mt-2">
+                          <span className="text-xs bg-muted px-2 py-0.5 rounded">Room: {301 + index}</span>
+                          <span className="text-xs bg-muted px-2 py-0.5 rounded">Section: 4COM{index + 1}</span>
+                        </div>
                       </div>
                       <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
                         {course.credits} Credits

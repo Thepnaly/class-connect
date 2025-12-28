@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { AdminSidebar, AdminView } from "./AdminSidebar";
 import { AdminOverview } from "./AdminOverview";
-import { ManageStudents } from "./ManageStudents";
-import { ManageTeachers } from "./ManageTeachers";
-import { ManageCourses } from "./ManageCourses";
 import { AdminReports } from "./AdminReports";
 import { SystemSettings } from "./SystemSettings";
 
@@ -15,12 +12,6 @@ export function AdminDashboard() {
     switch (currentView) {
       case "dashboard":
         return <AdminOverview />;
-      case "students":
-        return <ManageStudents />;
-      case "teachers":
-        return <ManageTeachers />;
-      case "courses":
-        return <ManageCourses />;
       case "reports":
         return <AdminReports />;
       case "settings":

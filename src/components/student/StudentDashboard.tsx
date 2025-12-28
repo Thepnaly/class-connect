@@ -151,7 +151,7 @@ export function StudentDashboard() {
             <div>
               <h2 className="text-2xl font-bold text-foreground">{student.name}</h2>
               <p className="text-muted-foreground">
-                {student.studentCode} • Gear {student.year} - Class 2
+                {student.studentCode} • Year {student.year} - Class 2
               </p>
               <p className="text-sm text-muted-foreground mt-0.5">
                 Computer Engineering and Information Technology Department
