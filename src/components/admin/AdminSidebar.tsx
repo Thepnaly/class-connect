@@ -1,9 +1,6 @@
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
-  Users,
-  GraduationCap,
-  BookOpen,
   BarChart3,
   Settings,
   ChevronLeft,
@@ -13,9 +10,6 @@ import { Button } from "@/components/ui/button";
 
 export type AdminView =
   | "dashboard"
-  | "students"
-  | "teachers"
-  | "courses"
   | "reports"
   | "settings";
 
@@ -28,9 +22,6 @@ interface AdminSidebarProps {
 
 const menuItems = [
   { id: "dashboard" as AdminView, label: "Dashboard", icon: LayoutDashboard },
-  { id: "students" as AdminView, label: "Manage Students", icon: Users },
-  { id: "teachers" as AdminView, label: "Manage Teachers", icon: GraduationCap },
-  { id: "courses" as AdminView, label: "Manage Courses", icon: BookOpen },
   { id: "reports" as AdminView, label: "Reports", icon: BarChart3 },
   { id: "settings" as AdminView, label: "System Settings", icon: Settings },
 ];
