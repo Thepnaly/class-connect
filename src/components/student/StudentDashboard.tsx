@@ -151,7 +151,7 @@ export function StudentDashboard() {
             <div>
               <h2 className="text-2xl font-bold text-foreground">{student.name}</h2>
               <p className="text-muted-foreground">
-                {student.studentCode} • Year {student.year} - Class 2
+                {student.studentCode} • Year 3 - Class 2
               </p>
               <p className="text-sm text-muted-foreground mt-0.5">
                 Major: Computer Engineering
@@ -481,6 +481,10 @@ export function StudentDashboard() {
                         )}
                       </CardTitle>
                       <CardDescription className="mt-1">{course.courseName}</CardDescription>
+                      <div className="flex gap-2 mt-2">
+                        <span className="text-xs bg-muted px-2 py-0.5 rounded">Room: {301 + parseInt(course.id)}</span>
+                        <span className="text-xs bg-muted px-2 py-0.5 rounded">Section: 4COM{parseInt(course.id)}</span>
+                      </div>
                     </div>
                     <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
                       {course.credits} Credits
