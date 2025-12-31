@@ -146,8 +146,8 @@ export function TeacherDashboard() {
                         <CardTitle className="text-lg">{course.courseCode}</CardTitle>
                         <CardDescription className="mt-1">{course.courseName}</CardDescription>
                         <div className="flex gap-2 mt-2">
-                          <span className="text-xs bg-muted px-2 py-0.5 rounded">Room: {301 + index}</span>
-                          <span className="text-xs bg-muted px-2 py-0.5 rounded">Section: 4COM{index + 1}</span>
+                          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded font-medium">Room: {course.room}</span>
+                          <span className="text-xs bg-info/10 text-info px-2 py-0.5 rounded font-medium">Section: {course.section}</span>
                         </div>
                       </div>
                       <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">

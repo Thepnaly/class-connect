@@ -61,7 +61,7 @@ export function SemesterSummaryPage({ courseId, onBack }: SemesterSummaryPagePro
         <div className="flex-1">
           <h2 className="text-2xl font-bold">Semester Summary</h2>
           <p className="text-muted-foreground">
-            {course.courseCode} - {course.courseName} • Semester {course.semester}
+            {course.courseCode} - {course.courseName} • Semester {course.semester} | Section: {course.section} | Room: {course.room}
           </p>
         </div>
         <div className="flex gap-2">
