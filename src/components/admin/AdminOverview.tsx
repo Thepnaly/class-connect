@@ -113,23 +113,52 @@ export function AdminOverview() {
               <TableRow className="table-header">
                 <TableHead>Student Code</TableHead>
                 <TableHead>Name</TableHead>
+                <TableHead>Major</TableHead>
+                <TableHead>Section</TableHead>
                 <TableHead>Course</TableHead>
+                <TableHead>Check-in Method</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Time</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {todaysRecords.map((record) => (
-                <TableRow key={record.id} className="table-row-hover">
-                  <TableCell className="font-medium">{record.studentCode}</TableCell>
-                  <TableCell>{record.studentName}</TableCell>
-                  <TableCell>CS301 - Data Structures</TableCell>
-                  <TableCell>
-                    <StatusBadge status={record.status} showLabel />
-                  </TableCell>
-                  <TableCell>{record.checkInTime || "-"}</TableCell>
-                </TableRow>
-              ))}
+              {todaysRecords.map((record, index) => {
+                // Simulated data for demonstration
+                const majorTypes = ["Computer Engineering", "Information Technology"];
+                const sections = ["3COM1", "3COM2", "3IT1", "3IT2", "4COM1", "4COM2", "4IT1", "4IT2"];
+                const checkInMethods = ["Face", "Code", "Manual"];
+                const isEdited = index % 4 === 0; // Simulate some edited records
+                
+                return (
+                  <TableRow key={record.id} className="table-row-hover">
+                    <TableCell className="font-medium">{record.studentCode}</TableCell>
+                    <TableCell>{record.studentName}</TableCell>
+                    <TableCell>
+                      <span className="text-xs bg-muted px-2 py-0.5 rounded">
+                        {majorTypes[index % 2]}
+                      </span>
+                    </TableCell>
+                    <TableCell className="font-mono text-sm">{sections[index % sections.length]}</TableCell>
+                    <TableCell>CS301 - Data Structures</TableCell>
+                    <TableCell>
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+                        {checkInMethods[index % 3]}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <StatusBadge status={record.status} showLabel />
+                        {isEdited && (
+                          <span className="text-[10px] bg-warning/20 text-warning px-1.5 py-0.5 rounded font-medium">
+                            Edited by Teacher
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{record.checkInTime || "-"}</TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>

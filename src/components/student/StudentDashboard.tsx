@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { studentCourses, attendanceRecords, classDates, students } from "@/data/dummyData";
+import { studentCourses, attendanceRecords, classDates, students, courses } from "@/data/dummyData";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
@@ -9,7 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen, Calendar, CheckCircle2, History, Clock, AlertCircle, Scan, Sparkles, User } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { BookOpen, Calendar, CheckCircle2, History, Clock, AlertCircle, Scan, Sparkles, User, Filter } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 // Mock schedule with time ranges
@@ -41,6 +42,11 @@ export function StudentDashboard() {
   const [checkInTime, setCheckInTime] = useState("");
   const [aiCheckInSuccess, setAiCheckInSuccess] = useState(false);
   const [showAiAnimation, setShowAiAnimation] = useState(false);
+  
+  // Archive filters
+  const [selectedArchiveYear, setSelectedArchiveYear] = useState("2024");
+  const [selectedArchiveSemester, setSelectedArchiveSemester] = useState("2");
+  const [selectedArchiveCourse, setSelectedArchiveCourse] = useState("all");
 
   const student = students[0];
   const studentRecords = attendanceRecords.filter((r) => r.studentId === student.id);
@@ -403,45 +409,126 @@ export function StudentDashboard() {
             <Dialog open={isHistoryDialogOpen} onOpenChange={setIsHistoryDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" className="w-full">
-                  View History
+                  View Full Archive
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-card max-w-3xl max-h-[80vh] overflow-y-auto">
+              <DialogContent className="bg-card max-w-5xl max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Attendance History</DialogTitle>
-                  <DialogDescription>Your complete attendance record</DialogDescription>
+                  <DialogTitle className="flex items-center gap-2">
+                    <History className="h-5 w-5" />
+                    Complete Attendance History Archive
+                  </DialogTitle>
+                  <DialogDescription>Your comprehensive attendance record across all semesters</DialogDescription>
                 </DialogHeader>
+                
+                {/* Archive Filters */}
+                <div className="flex flex-wrap items-center gap-4 p-4 bg-muted/30 rounded-lg border mb-4">
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Filters:</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Label className="text-sm">Academic Year:</Label>
+                    <Select value={selectedArchiveYear} onValueChange={setSelectedArchiveYear}>
+                      <SelectTrigger className="w-24 h-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="2023">2023</SelectItem>
+                        <SelectItem value="2024">2024</SelectItem>
+                        <SelectItem value="2025">2025</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Label className="text-sm">Semester:</Label>
+                    <Select value={selectedArchiveSemester} onValueChange={setSelectedArchiveSemester}>
+                      <SelectTrigger className="w-20 h-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1</SelectItem>
+                        <SelectItem value="2">2</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Label className="text-sm">Course:</Label>
+                    <Select value={selectedArchiveCourse} onValueChange={setSelectedArchiveCourse}>
+                      <SelectTrigger className="w-48 h-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Courses</SelectItem>
+                        {studentCourses.map((course) => (
+                          <SelectItem key={course.id} value={course.id}>
+                            {course.courseCode} - {course.courseName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="text-sm text-muted-foreground mb-2">
+                  Showing records for: Academic Year {selectedArchiveYear}, Semester {selectedArchiveSemester}
+                  {selectedArchiveCourse !== "all" && ` - ${studentCourses.find(c => c.id === selectedArchiveCourse)?.courseCode}`}
+                </div>
+
                 <Table>
                   <TableHeader>
                     <TableRow className="table-header">
+                      <TableHead className="w-12">No.</TableHead>
                       <TableHead>Date</TableHead>
-                      <TableHead>Course</TableHead>
+                      <TableHead>Course Code</TableHead>
+                      <TableHead>Section</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Time</TableHead>
                       <TableHead>Note</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {studentRecords.map((record) => {
-                      const classDate = classDates.find((d) => d.id === record.classDateId);
-                      return (
-                        <TableRow key={record.id} className="table-row-hover">
-                          <TableCell>{classDate ? formatDate(classDate.date) : "-"}</TableCell>
-                          <TableCell className="max-w-48 truncate">
-                            {getCourseName(record.classDateId)}
-                          </TableCell>
-                          <TableCell>
-                            <StatusBadge status={record.status} showLabel />
-                          </TableCell>
-                          <TableCell>{record.checkInTime || "-"}</TableCell>
-                          <TableCell className="text-muted-foreground text-sm">
-                            {record.note || "-"}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
+                    {studentRecords
+                      .filter(record => {
+                        if (selectedArchiveCourse === "all") return true;
+                        const classDate = classDates.find((d) => d.id === record.classDateId);
+                        return classDate?.courseId === selectedArchiveCourse;
+                      })
+                      .map((record, index) => {
+                        const classDate = classDates.find((d) => d.id === record.classDateId);
+                        const course = classDate ? courses.find(c => c.id === classDate.courseId) : null;
+                        return (
+                          <TableRow key={record.id} className="table-row-hover">
+                            <TableCell className="text-muted-foreground">{index + 1}</TableCell>
+                            <TableCell>{classDate ? formatDate(classDate.date) : "-"}</TableCell>
+                            <TableCell className="font-mono font-medium">
+                              {course?.courseCode || "N/A"}
+                            </TableCell>
+                            <TableCell className="font-mono text-sm">
+                              {course?.section || "N/A"}
+                            </TableCell>
+                            <TableCell>
+                              <StatusBadge status={record.status} showLabel />
+                            </TableCell>
+                            <TableCell>{record.checkInTime || "-"}</TableCell>
+                            <TableCell className="text-muted-foreground text-sm max-w-32 truncate">
+                              {record.note || "-"}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                   </TableBody>
                 </Table>
+
+                <div className="flex justify-between items-center pt-4 border-t mt-4">
+                  <div className="text-sm text-muted-foreground">
+                    Total Records: {studentRecords.length} | 
+                    Present: <span className="text-success font-medium">{stats.present}</span> | 
+                    Late: <span className="text-warning font-medium">{stats.late}</span> | 
+                    Absent: <span className="text-destructive font-medium">{stats.absent}</span> | 
+                    Leave: <span className="text-info font-medium">{stats.leave}</span>
+                  </div>
+                </div>
               </DialogContent>
             </Dialog>
           </CardContent>
@@ -482,8 +569,8 @@ export function StudentDashboard() {
                       </CardTitle>
                       <CardDescription className="mt-1">{course.courseName}</CardDescription>
                       <div className="flex gap-2 mt-2">
-                        <span className="text-xs bg-muted px-2 py-0.5 rounded">Room: {301 + parseInt(course.id)}</span>
-                        <span className="text-xs bg-muted px-2 py-0.5 rounded">Section: 4COM{parseInt(course.id)}</span>
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded font-medium">Room: {course.room}</span>
+                        <span className="text-xs bg-info/10 text-info px-2 py-0.5 rounded font-medium">Section: {course.section}</span>
                       </div>
                     </div>
                     <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">

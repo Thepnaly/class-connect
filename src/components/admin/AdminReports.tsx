@@ -617,17 +617,17 @@ export function AdminReports() {
                                 </div>
                               </Card>
 
-                              {/* Instructor Performance Table with Row Grouping */}
+                              {/* Instructor Performance Table with Row Grouping and Vertical Spanning */}
                               <Card className="p-4">
                                 <h4 className="font-semibold mb-4">Instructor Performance Table (Grouped by Name)</h4>
                                 <div className="overflow-x-auto">
-                                  <Table>
+                                  <Table className="border-collapse">
                                     <TableHeader>
                                       <TableRow className="table-header">
                                         <TableHead className="w-12">No.</TableHead>
                                         <TableHead>Course Name</TableHead>
-                                        <TableHead>Instructor Name</TableHead>
-                                        <TableHead className="text-center">Section</TableHead>
+                                        <TableHead className="border-r border-border">Instructor Name</TableHead>
+                                        <TableHead className="text-center">Teaching Section</TableHead>
                                         <TableHead className="text-center">Major</TableHead>
                                         <TableHead className="text-center">Actual Hours</TableHead>
                                         <TableHead className="text-center">At-Risk</TableHead>
@@ -639,43 +639,48 @@ export function AdminReports() {
                                       </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                      {Object.entries(groupedInstructors).map(([instructorName, courses], groupIndex) => (
-                                        courses.map((row, rowIndex) => (
-                                          <TableRow key={row.id} className={rowIndex === 0 ? "border-t-2 border-primary/20" : ""}>
-                                            <TableCell>{instructorPerformanceData.findIndex(r => r.id === row.id) + 1}</TableCell>
-                                            <TableCell className="font-medium">{row.courseName}</TableCell>
-                                            <TableCell className={rowIndex === 0 ? "font-semibold" : "text-muted-foreground"}>
-                                              {rowIndex === 0 ? instructorName : ""}
-                                            </TableCell>
-                                            <TableCell className="text-center font-mono">{row.section}</TableCell>
-                                            <TableCell className="text-center">
+                                      {Object.entries(groupedInstructors).map(([instructorName, instructorCourses], groupIndex) => (
+                                        instructorCourses.map((row, rowIndex) => (
+                                          <TableRow key={row.id} className={rowIndex === 0 ? "border-t-2 border-primary/30" : ""}>
+                                            <TableCell className={rowIndex > 0 ? "border-t-0" : ""}>{instructorPerformanceData.findIndex(r => r.id === row.id) + 1}</TableCell>
+                                            <TableCell className={`font-medium ${rowIndex > 0 ? "border-t-0" : ""}`}>{row.courseName}</TableCell>
+                                            {rowIndex === 0 && (
+                                              <TableCell 
+                                                rowSpan={instructorCourses.length} 
+                                                className="font-semibold bg-muted/30 align-middle text-center border-r border-border"
+                                              >
+                                                {instructorName}
+                                              </TableCell>
+                                            )}
+                                            <TableCell className={`text-center font-mono ${rowIndex > 0 ? "border-t-0" : ""}`}>{row.section}</TableCell>
+                                            <TableCell className={`text-center ${rowIndex > 0 ? "border-t-0" : ""}`}>
                                               <Badge variant="outline" className="text-xs">
-                                                {row.section.includes("COM") ? "CE" : "IT"}
+                                                {row.section.includes("COM") ? "Computer Engineering" : "Information Technology"}
                                               </Badge>
                                             </TableCell>
-                                            <TableCell className="text-center">
+                                            <TableCell className={`text-center ${rowIndex > 0 ? "border-t-0" : ""}`}>
                                               <span className={row.actualHours >= 48 ? "text-success font-semibold" : row.actualHours >= 36 ? "text-warning" : "text-destructive"}>
                                                 {row.actualHours}
                                               </span>
                                             </TableCell>
-                                            <TableCell className="text-center">
+                                            <TableCell className={`text-center ${rowIndex > 0 ? "border-t-0" : ""}`}>
                                               <Badge variant={row.atRiskCount > 3 ? "destructive" : row.atRiskCount > 0 ? "secondary" : "outline"}>
                                                 {row.atRiskCount}
                                               </Badge>
                                             </TableCell>
-                                            <TableCell className="text-center text-success font-medium">{row.attendanceCount}</TableCell>
-                                            <TableCell className="text-center">
+                                            <TableCell className={`text-center text-success font-medium ${rowIndex > 0 ? "border-t-0" : ""}`}>{row.attendanceCount}</TableCell>
+                                            <TableCell className={`text-center ${rowIndex > 0 ? "border-t-0" : ""}`}>
                                               <span className="text-orange-500 font-medium">{row.droppedCount}</span>
                                             </TableCell>
-                                            <TableCell className="text-center">
+                                            <TableCell className={`text-center ${rowIndex > 0 ? "border-t-0" : ""}`}>
                                               <span className="text-destructive font-medium">{row.resignedCount}</span>
                                             </TableCell>
-                                            <TableCell className="text-center">
+                                            <TableCell className={`text-center ${rowIndex > 0 ? "border-t-0" : ""}`}>
                                               <Badge variant="outline" className="text-xs">
                                                 {row.checkInMethod}
                                               </Badge>
                                             </TableCell>
-                                            <TableCell className="text-center">
+                                            <TableCell className={`text-center ${rowIndex > 0 ? "border-t-0" : ""}`}>
                                               {row.edited ? (
                                                 <Badge variant="secondary" className="text-xs gap-1">
                                                   <Pencil className="h-3 w-3" />
@@ -683,7 +688,7 @@ export function AdminReports() {
                                                 </Badge>
                                               ) : row.actualHours === 0 ? (
                                                 <Badge variant="destructive" className="text-xs">
-                                                  No Teaching
+                                                  No Teaching Conducted
                                                 </Badge>
                                               ) : (
                                                 <Badge variant="outline" className="text-xs text-success">
