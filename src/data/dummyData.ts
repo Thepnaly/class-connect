@@ -28,6 +28,8 @@ export interface Course {
   credits: number;
   semester: string;
   schedule: string;
+  section: string;
+  room: string;
 }
 
 export interface ClassDate {
@@ -75,10 +77,10 @@ export const teachers: Teacher[] = [
 
 // Courses
 export const courses: Course[] = [
-  { id: '1', courseCode: 'CS301', courseName: 'Data Structures and Algorithms', teacherId: '1', teacherName: 'Dr. Piyawat Lertsithichai', credits: 3, semester: '2/2024', schedule: 'Mon 09:00-12:00' },
-  { id: '2', courseCode: 'CS302', courseName: 'Database Management Systems', teacherId: '1', teacherName: 'Dr. Piyawat Lertsithichai', credits: 3, semester: '2/2024', schedule: 'Wed 13:00-16:00' },
-  { id: '3', courseCode: 'IT301', courseName: 'Web Application Development', teacherId: '2', teacherName: 'Assoc. Prof. Waraporn Narongrit', credits: 3, semester: '2/2024', schedule: 'Tue 09:00-12:00' },
-  { id: '4', courseCode: 'CS401', courseName: 'Software Engineering', teacherId: '3', teacherName: 'Dr. Chaiwat Suttipong', credits: 3, semester: '2/2024', schedule: 'Thu 13:00-16:00' },
+  { id: '1', courseCode: 'CS301', courseName: 'Data Structures and Algorithms', teacherId: '1', teacherName: 'Dr. Piyawat Lertsithichai', credits: 3, semester: '2/2024', schedule: 'Mon 09:00-12:00', section: '3COM1', room: '301' },
+  { id: '2', courseCode: 'CS302', courseName: 'Database Management Systems', teacherId: '1', teacherName: 'Dr. Piyawat Lertsithichai', credits: 3, semester: '2/2024', schedule: 'Wed 13:00-16:00', section: '3COM2', room: '402' },
+  { id: '3', courseCode: 'IT301', courseName: 'Web Application Development', teacherId: '2', teacherName: 'Assoc. Prof. Waraporn Narongrit', credits: 3, semester: '2/2024', schedule: 'Tue 09:00-12:00', section: '3IT1', room: '305' },
+  { id: '4', courseCode: 'CS401', courseName: 'Software Engineering', teacherId: '3', teacherName: 'Dr. Chaiwat Suttipong', credits: 3, semester: '2/2024', schedule: 'Thu 13:00-16:00', section: '4COM1', room: '401' },
 ];
 
 // Class Dates for CS301

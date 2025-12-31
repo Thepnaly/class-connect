@@ -38,7 +38,9 @@ export function ClassDatesPage({ courseId, onBack, onCheckIn, onSummary }: Class
           <h2 className="text-2xl font-bold">
             {course.courseCode} - {course.courseName}
           </h2>
-          <p className="text-muted-foreground">All Class Dates for Semester {course.semester}</p>
+          <p className="text-muted-foreground">
+            All Class Dates for Semester {course.semester} | Section: {course.section} | Room: {course.room}
+          </p>
         </div>
         <Button variant="outline" onClick={onSummary} className="gap-2">
           <BarChart3 className="h-4 w-4" />
