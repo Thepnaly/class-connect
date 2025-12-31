@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { classDates, attendanceRecords, AttendanceStatus, getStatusLabel, getRowClass } from "@/data/dummyData";
+import { classDates, attendanceRecords, courses, AttendanceStatus, getStatusLabel, getRowClass } from "@/data/dummyData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -19,6 +19,7 @@ interface DailyCheckInPageProps {
 
 export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps) {
   const classDate = classDates.find((d) => d.id === classDateId);
+  const course = classDate ? courses.find((c) => c.id === classDate.courseId) : null;
   const initialRecords = attendanceRecords.filter((r) => r.classDateId === classDateId);
   
   const [records, setRecords] = useState(initialRecords);
@@ -114,7 +115,9 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
         </Button>
         <div className="flex-1">
           <h2 className="text-2xl font-bold">Daily Check-in</h2>
-          <p className="text-muted-foreground">{formatDate(classDate.date)} • {classDate.time}</p>
+          <p className="text-muted-foreground">
+            {formatDate(classDate.date)} • {classDate.time} | Section: {course?.section || 'N/A'} | Room: {course?.room || 'N/A'}
+          </p>
         </div>
       </div>
 
