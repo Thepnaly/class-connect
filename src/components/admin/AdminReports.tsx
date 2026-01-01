@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
@@ -189,11 +190,32 @@ const reports = [
   },
 ];
 
+// Mock student data for class detail modal (Section 4COM1)
+const classDetailStudents = [
+  { id: "1", studentCode: "65070001", name: "Somsak Prasert", status: "present", time: "09:05", edited: false },
+  { id: "2", studentCode: "65070002", name: "Wilawan Thongchai", status: "present", time: "09:02", edited: false },
+  { id: "3", studentCode: "65070003", name: "Kittipong Somjai", status: "late", time: "09:25", edited: true },
+  { id: "4", studentCode: "65070004", name: "Pranee Rattana", status: "present", time: "09:01", edited: false },
+  { id: "5", studentCode: "65070005", name: "Thanawat Khunpol", status: "absent", time: "-", edited: true },
+  { id: "6", studentCode: "65070006", name: "Napat Suksawat", status: "present", time: "09:03", edited: false },
+  { id: "7", studentCode: "65070007", name: "Arisa Wongsiri", status: "present", time: "09:00", edited: false },
+  { id: "8", studentCode: "65070008", name: "Chaiwat Tanaka", status: "excused", time: "-", edited: true },
+  { id: "9", studentCode: "65070009", name: "Kanya Petcharat", status: "present", time: "09:04", edited: false },
+  { id: "10", studentCode: "65070010", name: "Prasit Lertsithichai", status: "present", time: "09:06", edited: false },
+];
+
 export function AdminReports() {
   const [atRiskDialogOpen, setAtRiskDialogOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState("2025");
   const [selectedSemester, setSelectedSemester] = useState("1");
   const [compareYear, setCompareYear] = useState("2024");
+  const [classDetailModalOpen, setClassDetailModalOpen] = useState(false);
+  const [selectedAuditSection, setSelectedAuditSection] = useState<{ section: string; editedOn: string; studentsModified: number } | null>(null);
+
+  const handleAuditBadgeClick = (section: string, editedOn: string, studentsModified: number) => {
+    setSelectedAuditSection({ section, editedOn, studentsModified });
+    setClassDetailModalOpen(true);
+  };
 
   const handleExport = (format: "excel" | "pdf", reportName: string) => {
     toast({
@@ -688,6 +710,7 @@ export function AdminReports() {
                                                     <TooltipTrigger asChild>
                                                       <Badge 
                                                         className="text-xs gap-1.5 cursor-pointer transition-all duration-200 bg-sky-100 text-sky-700 border border-sky-300 hover:bg-sky-200 hover:border-sky-400 hover:shadow-md dark:bg-sky-900/40 dark:text-sky-300 dark:border-sky-700 dark:hover:bg-sky-900/60"
+                                                        onClick={() => handleAuditBadgeClick(row.section, row.editedOn || "", row.studentsModified)}
                                                       >
                                                         <Pencil className="h-3 w-3" />
                                                         Edited by Teacher
@@ -704,6 +727,9 @@ export function AdminReports() {
                                                         </div>
                                                         <p className="text-muted-foreground">
                                                           Edited on {row.editedOn} • {row.studentsModified} Students Modified
+                                                        </p>
+                                                        <p className="text-xs text-sky-600 mt-1 font-medium dark:text-sky-400">
+                                                          Click to view class details →
                                                         </p>
                                                       </div>
                                                     </TooltipContent>
@@ -978,6 +1004,98 @@ export function AdminReports() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Class Detail Modal - Audit Drill Down */}
+      <Dialog open={classDetailModalOpen} onOpenChange={setClassDetailModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-sky-100 flex items-center justify-center dark:bg-sky-900/40">
+                <Pencil className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+              </div>
+              <div>
+                <span className="block">Attendance Record - Section {selectedAuditSection?.section || "4COM1"}</span>
+                <span className="block text-sm font-normal text-muted-foreground">
+                  Edited on {selectedAuditSection?.editedOn || "Oct 12, 10:45"} • {selectedAuditSection?.studentsModified || 3} Students Modified
+                </span>
+              </div>
+            </DialogTitle>
+            <DialogDescription>
+              Yellow highlighted rows indicate students whose attendance was manually modified by the instructor.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-4">
+                <Badge variant="outline" className="gap-1.5">
+                  <Calendar className="h-3.5 w-3.5" />
+                  Monday, October 12, 2024
+                </Badge>
+                <Badge variant="outline" className="gap-1.5">
+                  09:00 - 12:00
+                </Badge>
+                <Badge variant="outline" className="gap-1.5">
+                  Room: 301
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="h-3 w-6 rounded bg-yellow-100 border border-yellow-300 dark:bg-yellow-900/30 dark:border-yellow-700"></div>
+                <span>Modified by Teacher</span>
+              </div>
+            </div>
+            <div className="border rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="table-header">
+                    <TableHead className="w-12">No.</TableHead>
+                    <TableHead>Student Code</TableHead>
+                    <TableHead>Student Name</TableHead>
+                    <TableHead className="text-center">Status</TableHead>
+                    <TableHead className="text-center">Check-in Time</TableHead>
+                    <TableHead className="text-center">Modified</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {classDetailStudents.map((student, index) => (
+                    <TableRow 
+                      key={student.id} 
+                      className={student.edited ? "bg-yellow-50 border-l-4 border-l-yellow-400 dark:bg-yellow-900/20 dark:border-l-yellow-600" : ""}
+                    >
+                      <TableCell className="font-medium">{index + 1}</TableCell>
+                      <TableCell className="font-mono">{student.studentCode}</TableCell>
+                      <TableCell className="font-medium">{student.name}</TableCell>
+                      <TableCell className="text-center">
+                        <StatusBadge status={student.status as any} />
+                      </TableCell>
+                      <TableCell className="text-center font-mono">{student.time}</TableCell>
+                      <TableCell className="text-center">
+                        {student.edited && (
+                          <Badge className="text-xs gap-1 bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-900/40 dark:text-yellow-300 dark:border-yellow-700">
+                            <Pencil className="h-2.5 w-2.5" />
+                            Edited
+                          </Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            <div className="mt-4 p-3 bg-muted/30 rounded-lg border flex items-center justify-between">
+              <div className="flex items-center gap-4 text-sm">
+                <span className="text-muted-foreground">Summary:</span>
+                <Badge variant="outline" className="bg-success/10 text-success border-success/30">Present: 7</Badge>
+                <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">Late: 1</Badge>
+                <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30">Absent: 1</Badge>
+                <Badge variant="outline" className="bg-info/10 text-info border-info/30">Excused: 1</Badge>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Total: {classDetailStudents.length} students
+              </div>
             </div>
           </div>
         </DialogContent>
