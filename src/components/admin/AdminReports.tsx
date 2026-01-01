@@ -48,9 +48,9 @@ const teachingFrequencyData = [
 
 // Instructor performance data with detailed columns (grouped by instructor)
 const instructorPerformanceData = [
-  { id: "1", courseName: "Data Structures and Algorithms", instructorName: "Dr. Piyawat Lertsithichai", section: "4COM1", actualHours: 48, atRiskCount: 2, attendanceCount: 42, droppedCount: 1, resignedCount: 0, checkInMethod: "Face", edited: false, editedOn: null, studentsModified: 0 },
+  { id: "1", courseName: "Data Structures and Algorithms", instructorName: "Dr. Piyawat Lertsithichai", section: "4COM1", actualHours: 48, atRiskCount: 2, attendanceCount: 42, droppedCount: 1, resignedCount: 0, checkInMethod: "Face", edited: true, editedOn: "Oct 12, 10:45", studentsModified: 3 },
   { id: "2", courseName: "Data Structures and Algorithms", instructorName: "Dr. Piyawat Lertsithichai", section: "4COM2", actualHours: 48, atRiskCount: 3, attendanceCount: 40, droppedCount: 2, resignedCount: 0, checkInMethod: "Code", edited: true, editedOn: "Oct 10, 14:30", studentsModified: 5 },
-  { id: "3", courseName: "Database Management Systems", instructorName: "Dr. Piyawat Lertsithichai", section: "4IT_1", actualHours: 45, atRiskCount: 1, attendanceCount: 44, droppedCount: 0, resignedCount: 1, checkInMethod: "Face", edited: false, editedOn: null, studentsModified: 0 },
+  { id: "3", courseName: "Database Management Systems", instructorName: "Dr. Piyawat Lertsithichai", section: "4IT_1", actualHours: 45, atRiskCount: 1, attendanceCount: 44, droppedCount: 0, resignedCount: 1, checkInMethod: "Face", edited: true, editedOn: "Oct 8, 16:20", studentsModified: 2 },
   { id: "4", courseName: "Web Application Development", instructorName: "Assoc. Prof. Waraporn Narongrit", section: "4IT_1", actualHours: 48, atRiskCount: 1, attendanceCount: 44, droppedCount: 0, resignedCount: 1, checkInMethod: "Code", edited: false, editedOn: null, studentsModified: 0 },
   { id: "5", courseName: "Web Application Development", instructorName: "Assoc. Prof. Waraporn Narongrit", section: "4IT_2", actualHours: 45, atRiskCount: 2, attendanceCount: 41, droppedCount: 1, resignedCount: 0, checkInMethod: "Manual", edited: true, editedOn: "Oct 12, 09:15", studentsModified: 3 },
   { id: "6", courseName: "Software Engineering", instructorName: "Dr. Chaiwat Suttipong", section: "4COM1", actualHours: 42, atRiskCount: 4, attendanceCount: 38, droppedCount: 2, resignedCount: 1, checkInMethod: "Face", edited: false, editedOn: null, studentsModified: 0 },
@@ -683,18 +683,26 @@ export function AdminReports() {
                                             </TableCell>
                                             <TableCell className={`text-center ${rowIndex > 0 ? "border-t-0" : ""}`}>
                                               {row.edited ? (
-                                                <TooltipProvider>
+                                                <TooltipProvider delayDuration={0}>
                                                   <ShadcnTooltip>
                                                     <TooltipTrigger asChild>
-                                                      <Badge variant="secondary" className="text-xs gap-1 cursor-pointer hover:bg-secondary/80 transition-colors">
+                                                      <Badge 
+                                                        className="text-xs gap-1.5 cursor-pointer transition-all duration-200 bg-sky-100 text-sky-700 border border-sky-300 hover:bg-sky-200 hover:border-sky-400 hover:shadow-md dark:bg-sky-900/40 dark:text-sky-300 dark:border-sky-700 dark:hover:bg-sky-900/60"
+                                                      >
                                                         <Pencil className="h-3 w-3" />
                                                         Edited by Teacher
                                                       </Badge>
                                                     </TooltipTrigger>
-                                                    <TooltipContent className="bg-popover border p-3 shadow-lg">
+                                                    <TooltipContent 
+                                                      side="top" 
+                                                      className="bg-popover border-2 border-sky-200 p-3 shadow-xl rounded-lg dark:border-sky-800"
+                                                    >
                                                       <div className="text-sm">
-                                                        <p className="font-medium text-foreground">Audit Details</p>
-                                                        <p className="text-muted-foreground mt-1">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                          <Pencil className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
+                                                          <p className="font-semibold text-foreground">Manual Override</p>
+                                                        </div>
+                                                        <p className="text-muted-foreground">
                                                           Edited on {row.editedOn} • {row.studentsModified} Students Modified
                                                         </p>
                                                       </div>
