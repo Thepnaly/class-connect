@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileSpreadsheet, FileText, Eye, Users, AlertTriangle, GraduationCap, PieChart, BarChart3, Calendar, TrendingUp, Award, BookX, Building2, Pencil } from "lucide-react";
+import { Tooltip as ShadcnTooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "@/hooks/use-toast";
 import { 
   PieChart as RechartsPC, 
@@ -47,16 +48,16 @@ const teachingFrequencyData = [
 
 // Instructor performance data with detailed columns (grouped by instructor)
 const instructorPerformanceData = [
-  { id: "1", courseName: "Data Structures and Algorithms", instructorName: "Dr. Piyawat Lertsithichai", section: "4COM1", actualHours: 48, atRiskCount: 2, attendanceCount: 42, droppedCount: 1, resignedCount: 0, checkInMethod: "Face", edited: false },
-  { id: "2", courseName: "Data Structures and Algorithms", instructorName: "Dr. Piyawat Lertsithichai", section: "4COM2", actualHours: 48, atRiskCount: 3, attendanceCount: 40, droppedCount: 2, resignedCount: 0, checkInMethod: "Code", edited: true },
-  { id: "3", courseName: "Database Management Systems", instructorName: "Dr. Piyawat Lertsithichai", section: "4IT_1", actualHours: 45, atRiskCount: 1, attendanceCount: 44, droppedCount: 0, resignedCount: 1, checkInMethod: "Face", edited: false },
-  { id: "4", courseName: "Web Application Development", instructorName: "Assoc. Prof. Waraporn Narongrit", section: "4IT_1", actualHours: 48, atRiskCount: 1, attendanceCount: 44, droppedCount: 0, resignedCount: 1, checkInMethod: "Code", edited: false },
-  { id: "5", courseName: "Web Application Development", instructorName: "Assoc. Prof. Waraporn Narongrit", section: "4IT_2", actualHours: 45, atRiskCount: 2, attendanceCount: 41, droppedCount: 1, resignedCount: 0, checkInMethod: "Manual", edited: true },
-  { id: "6", courseName: "Software Engineering", instructorName: "Dr. Chaiwat Suttipong", section: "4COM1", actualHours: 42, atRiskCount: 4, attendanceCount: 38, droppedCount: 2, resignedCount: 1, checkInMethod: "Face", edited: false },
-  { id: "7", courseName: "Computer Networks", instructorName: "Asst. Prof. Napat Thongrak", section: "3COM1", actualHours: 21, atRiskCount: 8, attendanceCount: 30, droppedCount: 5, resignedCount: 3, checkInMethod: "Code", edited: false },
-  { id: "8", courseName: "System Analysis", instructorName: "Dr. Kanya Rattanakul", section: "3IT_1", actualHours: 48, atRiskCount: 0, attendanceCount: 45, droppedCount: 0, resignedCount: 0, checkInMethod: "Face", edited: false },
-  { id: "9", courseName: "Operating Systems", instructorName: "Dr. Prasit Suksawat", section: "3COM2", actualHours: 45, atRiskCount: 2, attendanceCount: 43, droppedCount: 1, resignedCount: 0, checkInMethod: "Manual", edited: false },
-  { id: "10", courseName: "Artificial Intelligence", instructorName: "Dr. Arisa Petcharat", section: "4IT_2", actualHours: 48, atRiskCount: 1, attendanceCount: 42, droppedCount: 0, resignedCount: 0, checkInMethod: "Face", edited: false },
+  { id: "1", courseName: "Data Structures and Algorithms", instructorName: "Dr. Piyawat Lertsithichai", section: "4COM1", actualHours: 48, atRiskCount: 2, attendanceCount: 42, droppedCount: 1, resignedCount: 0, checkInMethod: "Face", edited: false, editedOn: null, studentsModified: 0 },
+  { id: "2", courseName: "Data Structures and Algorithms", instructorName: "Dr. Piyawat Lertsithichai", section: "4COM2", actualHours: 48, atRiskCount: 3, attendanceCount: 40, droppedCount: 2, resignedCount: 0, checkInMethod: "Code", edited: true, editedOn: "Oct 10, 14:30", studentsModified: 5 },
+  { id: "3", courseName: "Database Management Systems", instructorName: "Dr. Piyawat Lertsithichai", section: "4IT_1", actualHours: 45, atRiskCount: 1, attendanceCount: 44, droppedCount: 0, resignedCount: 1, checkInMethod: "Face", edited: false, editedOn: null, studentsModified: 0 },
+  { id: "4", courseName: "Web Application Development", instructorName: "Assoc. Prof. Waraporn Narongrit", section: "4IT_1", actualHours: 48, atRiskCount: 1, attendanceCount: 44, droppedCount: 0, resignedCount: 1, checkInMethod: "Code", edited: false, editedOn: null, studentsModified: 0 },
+  { id: "5", courseName: "Web Application Development", instructorName: "Assoc. Prof. Waraporn Narongrit", section: "4IT_2", actualHours: 45, atRiskCount: 2, attendanceCount: 41, droppedCount: 1, resignedCount: 0, checkInMethod: "Manual", edited: true, editedOn: "Oct 12, 09:15", studentsModified: 3 },
+  { id: "6", courseName: "Software Engineering", instructorName: "Dr. Chaiwat Suttipong", section: "4COM1", actualHours: 42, atRiskCount: 4, attendanceCount: 38, droppedCount: 2, resignedCount: 1, checkInMethod: "Face", edited: false, editedOn: null, studentsModified: 0 },
+  { id: "7", courseName: "Computer Networks", instructorName: "Asst. Prof. Napat Thongrak", section: "3COM1", actualHours: 21, atRiskCount: 8, attendanceCount: 30, droppedCount: 5, resignedCount: 3, checkInMethod: "Code", edited: false, editedOn: null, studentsModified: 0 },
+  { id: "8", courseName: "System Analysis", instructorName: "Dr. Kanya Rattanakul", section: "3IT_1", actualHours: 48, atRiskCount: 0, attendanceCount: 45, droppedCount: 0, resignedCount: 0, checkInMethod: "Face", edited: false, editedOn: null, studentsModified: 0 },
+  { id: "9", courseName: "Operating Systems", instructorName: "Dr. Prasit Suksawat", section: "3COM2", actualHours: 45, atRiskCount: 2, attendanceCount: 43, droppedCount: 1, resignedCount: 0, checkInMethod: "Manual", edited: false, editedOn: null, studentsModified: 0 },
+  { id: "10", courseName: "Artificial Intelligence", instructorName: "Dr. Arisa Petcharat", section: "4IT_2", actualHours: 48, atRiskCount: 1, attendanceCount: 42, droppedCount: 0, resignedCount: 0, checkInMethod: "Face", edited: false, editedOn: null, studentsModified: 0 },
 ];
 
 // Group instructors for row grouping
@@ -682,10 +683,24 @@ export function AdminReports() {
                                             </TableCell>
                                             <TableCell className={`text-center ${rowIndex > 0 ? "border-t-0" : ""}`}>
                                               {row.edited ? (
-                                                <Badge variant="secondary" className="text-xs gap-1">
-                                                  <Pencil className="h-3 w-3" />
-                                                  Edited by Teacher
-                                                </Badge>
+                                                <TooltipProvider>
+                                                  <ShadcnTooltip>
+                                                    <TooltipTrigger asChild>
+                                                      <Badge variant="secondary" className="text-xs gap-1 cursor-pointer hover:bg-secondary/80 transition-colors">
+                                                        <Pencil className="h-3 w-3" />
+                                                        Edited by Teacher
+                                                      </Badge>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent className="bg-popover border p-3 shadow-lg">
+                                                      <div className="text-sm">
+                                                        <p className="font-medium text-foreground">Audit Details</p>
+                                                        <p className="text-muted-foreground mt-1">
+                                                          Edited on {row.editedOn} • {row.studentsModified} Students Modified
+                                                        </p>
+                                                      </div>
+                                                    </TooltipContent>
+                                                  </ShadcnTooltip>
+                                                </TooltipProvider>
                                               ) : row.actualHours === 0 ? (
                                                 <Badge variant="destructive" className="text-xs">
                                                   No Teaching Conducted
