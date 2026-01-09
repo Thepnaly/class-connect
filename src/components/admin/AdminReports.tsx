@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileSpreadsheet, FileText, Eye, Users, AlertTriangle, GraduationCap, PieChart, BarChart3, Calendar, TrendingUp, Award, BookX, Building2, Pencil } from "lucide-react";
+import { FileSpreadsheet, FileText, Eye, Users, AlertTriangle, GraduationCap, PieChart, BarChart3, Calendar, TrendingUp, Award, BookX, Building2, Pencil, ChevronRight, History } from "lucide-react";
 import { Tooltip as ShadcnTooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "@/hooks/use-toast";
 import { 
@@ -190,31 +190,100 @@ const reports = [
   },
 ];
 
-// Mock student data for class detail modal (Section 4COM1)
-const classDetailStudents = [
-  { id: "1", studentCode: "65070001", name: "Somsak Prasert", status: "present", time: "09:05", edited: false },
-  { id: "2", studentCode: "65070002", name: "Wilawan Thongchai", status: "present", time: "09:02", edited: false },
-  { id: "3", studentCode: "65070003", name: "Kittipong Somjai", status: "late", time: "09:25", edited: true },
-  { id: "4", studentCode: "65070004", name: "Pranee Rattana", status: "present", time: "09:01", edited: false },
-  { id: "5", studentCode: "65070005", name: "Thanawat Khunpol", status: "absent", time: "-", edited: true },
-  { id: "6", studentCode: "65070006", name: "Napat Suksawat", status: "present", time: "09:03", edited: false },
-  { id: "7", studentCode: "65070007", name: "Arisa Wongsiri", status: "present", time: "09:00", edited: false },
-  { id: "8", studentCode: "65070008", name: "Chaiwat Tanaka", status: "excused", time: "-", edited: true },
-  { id: "9", studentCode: "65070009", name: "Kanya Petcharat", status: "present", time: "09:04", edited: false },
-  { id: "10", studentCode: "65070010", name: "Prasit Lertsithichai", status: "present", time: "09:06", edited: false },
-];
+// Mock audit history data - multiple dates with edits
+const auditHistoryData: Record<string, { date: string; displayDate: string; studentsModified: number; students: Array<{ id: string; studentCode: string; name: string; status: string; time: string; edited: boolean }> }[]> = {
+  "4COM1": [
+    {
+      date: "2024-10-12",
+      displayDate: "October 12, 2024",
+      studentsModified: 3,
+      students: [
+        { id: "1", studentCode: "65070001", name: "Somsak Prasert", status: "present", time: "09:05", edited: false },
+        { id: "2", studentCode: "65070002", name: "Wilawan Thongchai", status: "present", time: "09:02", edited: false },
+        { id: "3", studentCode: "65070003", name: "Kittipong Somjai", status: "late", time: "09:25", edited: true },
+        { id: "4", studentCode: "65070004", name: "Pranee Rattana", status: "present", time: "09:01", edited: false },
+        { id: "5", studentCode: "65070005", name: "Thanawat Khunpol", status: "absent", time: "-", edited: true },
+        { id: "6", studentCode: "65070006", name: "Napat Suksawat", status: "present", time: "09:03", edited: false },
+        { id: "7", studentCode: "65070007", name: "Arisa Wongsiri", status: "present", time: "09:00", edited: false },
+        { id: "8", studentCode: "65070008", name: "Chaiwat Tanaka", status: "excused", time: "-", edited: true },
+        { id: "9", studentCode: "65070009", name: "Kanya Petcharat", status: "present", time: "09:04", edited: false },
+        { id: "10", studentCode: "65070010", name: "Prasit Lertsithichai", status: "present", time: "09:06", edited: false },
+      ]
+    },
+    {
+      date: "2024-10-08",
+      displayDate: "October 8, 2024",
+      studentsModified: 2,
+      students: [
+        { id: "1", studentCode: "65070001", name: "Somsak Prasert", status: "present", time: "09:00", edited: false },
+        { id: "2", studentCode: "65070002", name: "Wilawan Thongchai", status: "late", time: "09:18", edited: true },
+        { id: "3", studentCode: "65070003", name: "Kittipong Somjai", status: "present", time: "09:02", edited: false },
+        { id: "4", studentCode: "65070004", name: "Pranee Rattana", status: "present", time: "09:01", edited: false },
+        { id: "5", studentCode: "65070005", name: "Thanawat Khunpol", status: "present", time: "09:05", edited: false },
+        { id: "6", studentCode: "65070006", name: "Napat Suksawat", status: "excused", time: "-", edited: true },
+        { id: "7", studentCode: "65070007", name: "Arisa Wongsiri", status: "present", time: "09:03", edited: false },
+        { id: "8", studentCode: "65070008", name: "Chaiwat Tanaka", status: "present", time: "09:04", edited: false },
+        { id: "9", studentCode: "65070009", name: "Kanya Petcharat", status: "present", time: "09:01", edited: false },
+        { id: "10", studentCode: "65070010", name: "Prasit Lertsithichai", status: "present", time: "09:02", edited: false },
+      ]
+    }
+  ],
+  "4COM2": [
+    {
+      date: "2024-10-10",
+      displayDate: "October 10, 2024",
+      studentsModified: 5,
+      students: [
+        { id: "1", studentCode: "65070011", name: "Somchai Jaidee", status: "late", time: "09:20", edited: true },
+        { id: "2", studentCode: "65070012", name: "Nattaya Sombat", status: "present", time: "09:02", edited: false },
+        { id: "3", studentCode: "65070013", name: "Wichai Korn", status: "absent", time: "-", edited: true },
+        { id: "4", studentCode: "65070014", name: "Suporn Chai", status: "excused", time: "-", edited: true },
+        { id: "5", studentCode: "65070015", name: "Narong Suk", status: "present", time: "09:05", edited: false },
+        { id: "6", studentCode: "65070016", name: "Pakorn Wang", status: "late", time: "09:25", edited: true },
+        { id: "7", studentCode: "65070017", name: "Siriporn Lee", status: "present", time: "09:00", edited: false },
+        { id: "8", studentCode: "65070018", name: "Thawee Prasit", status: "absent", time: "-", edited: true },
+      ]
+    }
+  ],
+  "4IT_1": [
+    {
+      date: "2024-10-08",
+      displayDate: "October 8, 2024",
+      studentsModified: 2,
+      students: [
+        { id: "1", studentCode: "65070021", name: "Kamon Rattana", status: "present", time: "09:00", edited: false },
+        { id: "2", studentCode: "65070022", name: "Suwanna Chai", status: "late", time: "09:15", edited: true },
+        { id: "3", studentCode: "65070023", name: "Boonchai Wang", status: "present", time: "09:02", edited: false },
+        { id: "4", studentCode: "65070024", name: "Malai Suk", status: "excused", time: "-", edited: true },
+      ]
+    }
+  ],
+};
 
 export function AdminReports() {
   const [atRiskDialogOpen, setAtRiskDialogOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState("2025");
   const [selectedSemester, setSelectedSemester] = useState("1");
   const [compareYear, setCompareYear] = useState("2024");
+  const [auditHistoryModalOpen, setAuditHistoryModalOpen] = useState(false);
   const [classDetailModalOpen, setClassDetailModalOpen] = useState(false);
-  const [selectedAuditSection, setSelectedAuditSection] = useState<{ section: string; editedOn: string; studentsModified: number } | null>(null);
+  const [selectedAuditSection, setSelectedAuditSection] = useState<string | null>(null);
+  const [selectedAuditDate, setSelectedAuditDate] = useState<{ date: string; displayDate: string; studentsModified: number; students: Array<{ id: string; studentCode: string; name: string; status: string; time: string; edited: boolean }> } | null>(null);
 
-  const handleAuditBadgeClick = (section: string, editedOn: string, studentsModified: number) => {
-    setSelectedAuditSection({ section, editedOn, studentsModified });
+  const handleAuditBadgeClick = (section: string) => {
+    setSelectedAuditSection(section);
+    setAuditHistoryModalOpen(true);
+  };
+
+  const handleDateClick = (dateEntry: typeof selectedAuditDate) => {
+    setSelectedAuditDate(dateEntry);
+    setAuditHistoryModalOpen(false);
     setClassDetailModalOpen(true);
+  };
+
+  const handleBackToHistory = () => {
+    setClassDetailModalOpen(false);
+    setAuditHistoryModalOpen(true);
   };
 
   const handleExport = (format: "excel" | "pdf", reportName: string) => {
@@ -710,7 +779,7 @@ export function AdminReports() {
                                                     <TooltipTrigger asChild>
                                                       <Badge 
                                                         className="text-xs gap-1.5 cursor-pointer transition-all duration-200 bg-sky-100 text-sky-700 border border-sky-300 hover:bg-sky-200 hover:border-sky-400 hover:shadow-md dark:bg-sky-900/40 dark:text-sky-300 dark:border-sky-700 dark:hover:bg-sky-900/60"
-                                                        onClick={() => handleAuditBadgeClick(row.section, row.editedOn || "", row.studentsModified)}
+                                                        onClick={() => handleAuditBadgeClick(row.section)}
                                                       >
                                                         <Pencil className="h-3 w-3" />
                                                         Edited by Teacher
@@ -722,14 +791,14 @@ export function AdminReports() {
                                                     >
                                                       <div className="text-sm">
                                                         <div className="flex items-center gap-2 mb-1">
-                                                          <Pencil className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
-                                                          <p className="font-semibold text-foreground">Manual Override</p>
+                                                          <History className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
+                                                          <p className="font-semibold text-foreground">Edit History Available</p>
                                                         </div>
                                                         <p className="text-muted-foreground">
-                                                          Edited on {row.editedOn} • {row.studentsModified} Students Modified
+                                                          {auditHistoryData[row.section]?.length || 0} date(s) with modifications
                                                         </p>
                                                         <p className="text-xs text-sky-600 mt-1 font-medium dark:text-sky-400">
-                                                          Click to view class details →
+                                                          Click to view edit history →
                                                         </p>
                                                       </div>
                                                     </TooltipContent>
@@ -1009,18 +1078,75 @@ export function AdminReports() {
         </DialogContent>
       </Dialog>
 
-      {/* Class Detail Modal - Audit Drill Down */}
+      {/* Edit History Log Modal - Step 1: Date Selection */}
+      <Dialog open={auditHistoryModalOpen} onOpenChange={setAuditHistoryModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-sky-100 flex items-center justify-center dark:bg-sky-900/40">
+                <History className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+              </div>
+              <div>
+                <span className="block">Edit History Log</span>
+                <span className="block text-sm font-normal text-muted-foreground">
+                  Section {selectedAuditSection}
+                </span>
+              </div>
+            </DialogTitle>
+            <DialogDescription>
+              Select a date to view the attendance record with modifications.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 space-y-2">
+            {selectedAuditSection && auditHistoryData[selectedAuditSection]?.map((dateEntry, index) => (
+              <button
+                key={dateEntry.date}
+                onClick={() => handleDateClick(dateEntry)}
+                className="w-full p-4 rounded-lg border border-border bg-card hover:bg-muted/50 hover:border-sky-300 transition-all duration-200 flex items-center justify-between group cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center group-hover:bg-sky-100 dark:group-hover:bg-sky-900/40 transition-colors">
+                    <Calendar className="h-5 w-5 text-muted-foreground group-hover:text-sky-600 dark:group-hover:text-sky-400" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-medium text-foreground">{dateEntry.displayDate}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {dateEntry.studentsModified} Student{dateEntry.studentsModified !== 1 ? 's' : ''} Modified
+                    </p>
+                  </div>
+                </div>
+                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-sky-600 group-hover:translate-x-1 transition-all" />
+              </button>
+            ))}
+            {(!selectedAuditSection || !auditHistoryData[selectedAuditSection]?.length) && (
+              <div className="p-8 text-center text-muted-foreground">
+                No edit history found for this section.
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Class Detail Modal - Step 2: Attendance Record */}
       <Dialog open={classDetailModalOpen} onOpenChange={setClassDetailModalOpen}>
         <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-10 w-10 p-0 rounded-lg"
+                onClick={handleBackToHistory}
+              >
+                <ChevronRight className="h-5 w-5 rotate-180" />
+              </Button>
               <div className="h-10 w-10 rounded-lg bg-sky-100 flex items-center justify-center dark:bg-sky-900/40">
                 <Pencil className="h-5 w-5 text-sky-600 dark:text-sky-400" />
               </div>
               <div>
-                <span className="block">Attendance Record - Section {selectedAuditSection?.section || "4COM1"}</span>
+                <span className="block">Attendance Record - Section {selectedAuditSection}</span>
                 <span className="block text-sm font-normal text-muted-foreground">
-                  Edited on {selectedAuditSection?.editedOn || "Oct 12, 10:45"} • {selectedAuditSection?.studentsModified || 3} Students Modified
+                  {selectedAuditDate?.displayDate} • {selectedAuditDate?.studentsModified} Students Modified
                 </span>
               </div>
             </DialogTitle>
@@ -1033,7 +1159,7 @@ export function AdminReports() {
               <div className="flex items-center gap-4">
                 <Badge variant="outline" className="gap-1.5">
                   <Calendar className="h-3.5 w-3.5" />
-                  Monday, October 12, 2024
+                  {selectedAuditDate?.displayDate}
                 </Badge>
                 <Badge variant="outline" className="gap-1.5">
                   09:00 - 12:00
@@ -1060,7 +1186,7 @@ export function AdminReports() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {classDetailStudents.map((student, index) => (
+                  {selectedAuditDate?.students.map((student, index) => (
                     <TableRow 
                       key={student.id} 
                       className={student.edited ? "bg-yellow-50 border-l-4 border-l-yellow-400 dark:bg-yellow-900/20 dark:border-l-yellow-600" : ""}
@@ -1088,13 +1214,21 @@ export function AdminReports() {
             <div className="mt-4 p-3 bg-muted/30 rounded-lg border flex items-center justify-between">
               <div className="flex items-center gap-4 text-sm">
                 <span className="text-muted-foreground">Summary:</span>
-                <Badge variant="outline" className="bg-success/10 text-success border-success/30">Present: 7</Badge>
-                <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">Late: 1</Badge>
-                <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30">Absent: 1</Badge>
-                <Badge variant="outline" className="bg-info/10 text-info border-info/30">Excused: 1</Badge>
+                <Badge variant="outline" className="bg-success/10 text-success border-success/30">
+                  Present: {selectedAuditDate?.students.filter(s => s.status === 'present').length || 0}
+                </Badge>
+                <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">
+                  Late: {selectedAuditDate?.students.filter(s => s.status === 'late').length || 0}
+                </Badge>
+                <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30">
+                  Absent: {selectedAuditDate?.students.filter(s => s.status === 'absent').length || 0}
+                </Badge>
+                <Badge variant="outline" className="bg-info/10 text-info border-info/30">
+                  Excused: {selectedAuditDate?.students.filter(s => s.status === 'excused').length || 0}
+                </Badge>
               </div>
               <div className="text-sm text-muted-foreground">
-                Total: {classDetailStudents.length} students
+                Total: {selectedAuditDate?.students.length || 0} students
               </div>
             </div>
           </div>
