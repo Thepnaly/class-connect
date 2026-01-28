@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { ArrowLeft, Play, Clock, Plus, StopCircle, FileSpreadsheet, FileText, Pencil, MessageSquare } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Play, Clock, Plus, StopCircle, FileSpreadsheet, FileText, Pencil, MessageSquare, XCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
@@ -28,6 +29,8 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
   const [duration, setDuration] = useState(15);
   const [timeRemaining, setTimeRemaining] = useState(duration * 60);
   const [editingNote, setEditingNote] = useState<string | null>(null);
+  const [cancelClassModalOpen, setCancelClassModalOpen] = useState(false);
+  const [cancellationReason, setCancellationReason] = useState("");
   const [noteText, setNoteText] = useState("");
 
   if (!classDate) return null;
@@ -171,6 +174,14 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
                 <Button onClick={handleStartCheckIn} className="gap-2">
                   <Play className="h-4 w-4" />
                   Start Check-in
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={() => setCancelClassModalOpen(true)} 
+                  className="gap-2"
+                >
+                  <XCircle className="h-4 w-4" />
+                  Cancel Class
                 </Button>
               </>
             ) : (
@@ -328,6 +339,62 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
           </Table>
         </CardContent>
       </Card>
+
+      {/* Cancel Class Modal */}
+      <Dialog open={cancelClassModalOpen} onOpenChange={setCancelClassModalOpen}>
+        <DialogContent className="sm:max-w-md bg-card">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <XCircle className="h-5 w-5" />
+              Cancel Class
+            </DialogTitle>
+            <DialogDescription>
+              Please provide a reason for cancelling this class session. This will be logged for administrative records.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="cancellationReason">Reason for Cancellation</Label>
+              <Textarea
+                id="cancellationReason"
+                placeholder="Enter the reason for cancelling this class (e.g., instructor illness, emergency, etc.)"
+                value={cancellationReason}
+                onChange={(e) => setCancellationReason(e.target.value)}
+                className="min-h-[120px]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setCancelClassModalOpen(false);
+              setCancellationReason("");
+            }}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => {
+                if (!cancellationReason.trim()) {
+                  toast({
+                    title: "Error",
+                    description: "Please provide a reason for cancellation.",
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                toast({
+                  title: "Class Cancelled",
+                  description: "The class has been cancelled and the reason has been logged.",
+                });
+                setCancelClassModalOpen(false);
+                setCancellationReason("");
+              }}
+            >
+              Confirm Cancellation
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

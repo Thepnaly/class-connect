@@ -509,6 +509,56 @@ export function AdminReports() {
                                   </div>
                                 </Card>
                               </div>
+
+                              {/* Year Comparison Bar Chart */}
+                              {compareYear && compareYear !== selectedYear && (
+                                <Card className="p-4">
+                                  <h4 className="font-semibold mb-4 flex items-center gap-2">
+                                    <BarChart3 className="h-5 w-5 text-info" />
+                                    Year Comparison: {selectedYear} vs {compareYear}
+                                  </h4>
+                                  <div className="h-80">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                      <BarChart 
+                                        data={[
+                                          { section: "4COM1", current: 92, compare: 88 },
+                                          { section: "4COM2", current: 88, compare: 85 },
+                                          { section: "4IT_1", current: 85, compare: 82 },
+                                          { section: "4IT_2", current: 78, compare: 75 },
+                                          { section: "3COM1", current: 75, compare: 80 },
+                                          { section: "3COM2", current: 90, compare: 86 },
+                                          { section: "3IT_1", current: 82, compare: 79 },
+                                          { section: "3IT_2", current: 55, compare: 60 },
+                                        ]} 
+                                        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                                      >
+                                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                        <XAxis dataKey="section" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                                        <YAxis stroke="hsl(var(--muted-foreground))" domain={[0, 100]} />
+                                        <Tooltip 
+                                          contentStyle={{ 
+                                            backgroundColor: "hsl(var(--card))", 
+                                            border: "1px solid hsl(var(--border))",
+                                            borderRadius: "8px"
+                                          }}
+                                          formatter={(value: number, name: string) => [
+                                            `${value}%`,
+                                            name === 'current' ? `${selectedYear}` : `${compareYear}`
+                                          ]}
+                                        />
+                                        <Legend 
+                                          formatter={(value) => value === 'current' ? `${selectedYear}` : `${compareYear}`}
+                                        />
+                                        <Bar dataKey="current" fill="hsl(221, 83%, 53%)" name="current" radius={[4, 4, 0, 0]} />
+                                        <Bar dataKey="compare" fill="hsl(var(--muted-foreground))" name="compare" radius={[4, 4, 0, 0]} />
+                                      </BarChart>
+                                    </ResponsiveContainer>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground text-center mt-2">
+                                    Side-by-side attendance rate comparison by section
+                                  </p>
+                                </Card>
+                              )}
                             </div>
                           )}
 
@@ -988,6 +1038,8 @@ export function AdminReports() {
                     variant="outline"
                     size="icon"
                     onClick={() => handleExport("excel", report.title)}
+                    className="border-green-500/50 text-green-600 hover:bg-green-50 hover:text-green-700 hover:border-green-600 dark:hover:bg-green-950/50"
+                    title="Export to Excel"
                   >
                     <FileSpreadsheet className="h-4 w-4" />
                   </Button>
@@ -995,6 +1047,8 @@ export function AdminReports() {
                     variant="outline"
                     size="icon"
                     onClick={() => handleExport("pdf", report.title)}
+                    className="border-red-500/50 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-600 dark:hover:bg-red-950/50"
+                    title="Export to PDF"
                   >
                     <FileText className="h-4 w-4" />
                   </Button>
