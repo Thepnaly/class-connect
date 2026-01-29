@@ -10,8 +10,9 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Calendar, CheckCircle2, History, Clock, AlertCircle, Scan, Sparkles, User, Filter } from "lucide-react";
+import { BookOpen, Calendar, CheckCircle2, History, Clock, AlertCircle, Scan, Sparkles, User, Filter, XCircle, Ban } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { cancelledClassesStore, CancelledClass } from "@/lib/cancelledClasses";
 
 // Mock schedule with time ranges
 const courseSchedules = [
@@ -47,6 +48,15 @@ export function StudentDashboard() {
   const [selectedArchiveYear, setSelectedArchiveYear] = useState("2024");
   const [selectedArchiveSemester, setSelectedArchiveSemester] = useState("2");
   const [selectedArchiveCourse, setSelectedArchiveCourse] = useState("all");
+  const [cancelledClasses, setCancelledClasses] = useState<CancelledClass[]>(cancelledClassesStore.getAll());
+
+  // Subscribe to cancelled classes changes
+  useEffect(() => {
+    const unsubscribe = cancelledClassesStore.subscribe(() => {
+      setCancelledClasses(cancelledClassesStore.getAll());
+    });
+    return unsubscribe;
+  }, []);
 
   const student = students[0];
   const studentRecords = attendanceRecords.filter((r) => r.studentId === student.id);
@@ -77,10 +87,12 @@ export function StudentDashboard() {
       .filter((s) => s.day === currentDay)
       .map((schedule) => {
         const course = studentCourses.find((c) => c.id === schedule.courseId);
-        const isOngoing = currentHour >= schedule.startHour && currentHour < schedule.endHour;
-        const isNext = currentHour < schedule.startHour;
+        const isCancelled = cancelledClasses.some(c => c.courseId === schedule.courseId);
+        const cancellationInfo = cancelledClasses.find(c => c.courseId === schedule.courseId);
+        const isOngoing = !isCancelled && currentHour >= schedule.startHour && currentHour < schedule.endHour;
+        const isNext = !isCancelled && currentHour < schedule.startHour;
         const isPast = currentHour >= schedule.endHour;
-        return { ...schedule, course, isOngoing, isNext, isPast };
+        return { ...schedule, course, isOngoing, isNext, isPast, isCancelled, cancellationInfo };
       })
       .sort((a, b) => a.startHour - b.startHour);
   };
@@ -232,7 +244,9 @@ export function StudentDashboard() {
                 <div
                   key={schedule.courseId}
                   className={`flex items-center justify-between p-4 rounded-lg border transition-all duration-300 ${
-                    schedule.isOngoing
+                    schedule.isCancelled
+                      ? "bg-destructive/10 border-destructive/30 ring-2 ring-destructive/20"
+                      : schedule.isOngoing
                       ? "bg-success/10 border-success/30 ring-2 ring-success/20"
                       : schedule.isNext
                       ? "bg-warning/5 border-warning/20"
@@ -241,28 +255,47 @@ export function StudentDashboard() {
                 >
                   <div className="flex items-center gap-4">
                     <div className={`h-12 w-12 rounded-lg flex items-center justify-center ${
-                      schedule.isOngoing ? "bg-success/20" : schedule.isNext ? "bg-warning/20" : "bg-muted"
+                      schedule.isCancelled ? "bg-destructive/20" : schedule.isOngoing ? "bg-success/20" : schedule.isNext ? "bg-warning/20" : "bg-muted"
                     }`}>
-                      <BookOpen className={`h-6 w-6 ${
-                        schedule.isOngoing ? "text-success" : schedule.isNext ? "text-warning" : "text-muted-foreground"
-                      }`} />
+                      {schedule.isCancelled ? (
+                        <Ban className="h-6 w-6 text-destructive" />
+                      ) : (
+                        <BookOpen className={`h-6 w-6 ${
+                          schedule.isOngoing ? "text-success" : schedule.isNext ? "text-warning" : "text-muted-foreground"
+                        }`} />
+                      )}
                     </div>
                     <div>
-                      <p className="font-semibold">{schedule.course?.courseCode}</p>
-                      <p className="text-sm text-muted-foreground">{schedule.course?.courseName}</p>
+                      <p className={`font-semibold ${schedule.isCancelled ? "text-destructive line-through" : ""}`}>
+                        {schedule.course?.courseCode}
+                      </p>
+                      <p className={`text-sm ${schedule.isCancelled ? "text-destructive/70 line-through" : "text-muted-foreground"}`}>
+                        {schedule.course?.courseName}
+                      </p>
                       <p className="text-xs text-muted-foreground">Section: {schedule.section}</p>
+                      {schedule.isCancelled && schedule.cancellationInfo && (
+                        <p className="text-xs text-destructive mt-1">
+                          Reason: {schedule.cancellationInfo.reason}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">
+                    <p className={`font-medium ${schedule.isCancelled ? "text-destructive/70 line-through" : ""}`}>
                       {schedule.startHour.toString().padStart(2, "0")}:00 - {schedule.endHour.toString().padStart(2, "0")}:00
                     </p>
-                    {schedule.isOngoing && (
+                    {schedule.isCancelled && (
+                      <Badge className="bg-destructive text-destructive-foreground mt-1 gap-1">
+                        <XCircle className="h-3 w-3" />
+                        Class Cancelled
+                      </Badge>
+                    )}
+                    {!schedule.isCancelled && schedule.isOngoing && (
                       <Badge className="bg-success text-success-foreground mt-1 animate-pulse">
                         Ongoing
                       </Badge>
                     )}
-                    {schedule.isNext && (
+                    {!schedule.isCancelled && schedule.isNext && (
                       <Badge variant="outline" className="border-warning text-warning mt-1">
                         Next Class
                       </Badge>
