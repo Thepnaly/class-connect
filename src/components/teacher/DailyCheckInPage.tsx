@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { classDates, attendanceRecords, courses, AttendanceStatus, getStatusLabel, getRowClass } from "@/data/dummyData";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { classDates, students, courses, AttendanceStatus, getStatusLabel, getRowClass } from "@/data/dummyData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,10 +9,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Play, Clock, Plus, StopCircle, FileSpreadsheet, FileText, Pencil, MessageSquare, XCircle } from "lucide-react";
+import { ArrowLeft, Play, Clock, Plus, StopCircle, FileSpreadsheet, FileText, MessageSquare, XCircle, Timer } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { cancelledClassesStore } from "@/lib/cancelledClasses";
+
+interface AttendanceRecord {
+  id: string;
+  studentId: string;
+  studentCode: string;
+  studentName: string;
+  classDateId: string;
+  status: AttendanceStatus;
+  checkInTime?: string;
+  isDropped: boolean;
+  note: string;
+}
 
 interface DailyCheckInPageProps {
   classDateId: string;
@@ -22,18 +34,54 @@ interface DailyCheckInPageProps {
 export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps) {
   const classDate = classDates.find((d) => d.id === classDateId);
   const course = classDate ? courses.find((c) => c.id === classDate.courseId) : null;
-  const initialRecords = attendanceRecords.filter((r) => r.classDateId === classDateId);
   
-  const [records, setRecords] = useState(initialRecords);
+  // Initialize all students with Absent status by default
+  const initialRecords: AttendanceRecord[] = students.map((student, index) => ({
+    id: `${classDateId}-${student.id}`,
+    studentId: student.id,
+    studentCode: student.studentCode,
+    studentName: student.name,
+    classDateId: classDateId,
+    status: 'X' as AttendanceStatus, // Default to Absent
+    checkInTime: undefined,
+    isDropped: false,
+    note: '',
+  }));
+  
+  const [records, setRecords] = useState<AttendanceRecord[]>(initialRecords);
   const [isCheckInActive, setIsCheckInActive] = useState(classDate?.isActive || false);
   const [checkInCode, setCheckInCode] = useState(classDate?.checkInCode || "");
   const [duration, setDuration] = useState(15);
-  const [timeRemaining, setTimeRemaining] = useState(duration * 60);
+  const [sessionDuration, setSessionDuration] = useState<number | null>(null); // Session-specific override
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [cancelClassModalOpen, setCancelClassModalOpen] = useState(false);
+  const [durationModalOpen, setDurationModalOpen] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
   const [noteText, setNoteText] = useState("");
   const [isClassCancelled, setIsClassCancelled] = useState(cancelledClassesStore.isCancelled(classDateId));
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (isCheckInActive && timeRemaining !== null && timeRemaining > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeRemaining((prev) => {
+          if (prev === null || prev <= 1) {
+            handleEndCheckIn();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isCheckInActive, timeRemaining]);
 
   if (!classDate) return null;
 
@@ -47,26 +95,47 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
     });
   };
 
-  const handleStartCheckIn = () => {
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    setCheckInCode(code);
-    setIsCheckInActive(true);
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleConfirmDuration = () => {
+    setSessionDuration(duration);
+    setDurationModalOpen(false);
     toast({
-      title: "Check-in Started",
-      description: `Check-in code: ${code}. Duration: ${duration} minutes.`,
+      title: "Duration Set",
+      description: `Check-in duration set to ${duration} minutes for this session.`,
     });
   };
 
-  const handleEndCheckIn = () => {
+  const handleStartCheckIn = () => {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const checkInDuration = sessionDuration || duration;
+    setCheckInCode(code);
+    setIsCheckInActive(true);
+    setTimeRemaining(checkInDuration * 60);
+    toast({
+      title: "Check-in Started",
+      description: `Check-in code: ${code}. Duration: ${checkInDuration} minutes.`,
+    });
+  };
+
+  const handleEndCheckIn = useCallback(() => {
     setIsCheckInActive(false);
+    setTimeRemaining(null);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
     toast({
       title: "Check-in Ended",
       description: "Students can no longer check in.",
     });
-  };
+  }, []);
 
   const handleExtend = () => {
-    setTimeRemaining((prev) => prev + 300);
+    setTimeRemaining((prev) => (prev !== null ? prev + 300 : 300));
     toast({
       title: "Time Extended",
       description: "Added 5 minutes to check-in duration.",
@@ -82,6 +151,22 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
     toast({
       title: "Status Updated",
       description: `Changed status to ${getStatusLabel(newStatus)}`,
+    });
+  };
+
+  // Simulate student check-in (for demo purposes)
+  const handleSimulateCheckIn = (studentId: string) => {
+    const now = new Date();
+    const checkInTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    setRecords((prev) =>
+      prev.map((r) =>
+        r.studentId === studentId ? { ...r, status: 'O' as AttendanceStatus, checkInTime } : r
+      )
+    );
+    toast({
+      title: "Student Checked In",
+      description: `Student has been marked as Present.`,
     });
   };
 
@@ -134,27 +219,41 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
               <Clock className="h-5 w-5 text-primary" />
               Check-in Control
             </span>
-            {isCheckInActive && (
-              <Badge className="bg-success text-success-foreground animate-pulse">
-                Active • Code: {checkInCode}
-              </Badge>
-            )}
+            <div className="flex items-center gap-3">
+              {/* Countdown Timer Display */}
+              {isCheckInActive && timeRemaining !== null && (
+                <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-lg border border-primary/20">
+                  <Timer className="h-5 w-5 text-primary animate-pulse" />
+                  <span className="text-2xl font-mono font-bold text-primary">
+                    {formatTime(timeRemaining)}
+                  </span>
+                </div>
+              )}
+              {isCheckInActive && (
+                <Badge className="bg-success text-success-foreground animate-pulse">
+                  Active • Code: {checkInCode}
+                </Badge>
+              )}
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4">
             {!isCheckInActive ? (
               <>
-                <Dialog>
+                <Dialog open={durationModalOpen} onOpenChange={setDurationModalOpen}>
                   <DialogTrigger asChild>
                     <Button variant="outline" className="gap-2">
                       <Clock className="h-4 w-4" />
-                      Set Duration
+                      Set Duration {sessionDuration && `(${sessionDuration} min)`}
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="bg-card">
                     <DialogHeader>
                       <DialogTitle>Set Check-in Duration</DialogTitle>
+                      <DialogDescription>
+                        This sets the duration for this class session only. It does not affect the global system settings.
+                      </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 pt-4">
                       <div className="space-y-2">
@@ -167,7 +266,7 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
                           max={60}
                         />
                       </div>
-                      <Button className="w-full" onClick={() => {}}>
+                      <Button className="w-full" onClick={handleConfirmDuration}>
                         Confirm Duration
                       </Button>
                     </div>
@@ -234,7 +333,7 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Attendance Records</CardTitle>
+            <CardTitle>Attendance Records ({records.length} Students)</CardTitle>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => handleExport("excel")} className="gap-2">
                 <FileSpreadsheet className="h-4 w-4" />
@@ -259,6 +358,7 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
                 <TableHead>Drop/Withdraw</TableHead>
                 <TableHead>Edit</TableHead>
                 <TableHead>Note</TableHead>
+                {isCheckInActive && <TableHead>Action</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -334,6 +434,20 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
                         </div>
                       )}
                     </TableCell>
+                    {isCheckInActive && (
+                      <TableCell>
+                        {record.status === 'X' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs"
+                            onClick={() => handleSimulateCheckIn(record.studentId)}
+                          >
+                            Simulate Check-in
+                          </Button>
+                        )}
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })}
