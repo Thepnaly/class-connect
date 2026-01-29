@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Play, Clock, Plus, StopCircle, FileSpreadsheet, FileText, Pencil, MessageSquare, XCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { cancelledClassesStore } from "@/lib/cancelledClasses";
 
 interface DailyCheckInPageProps {
   classDateId: string;
@@ -32,6 +33,7 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
   const [cancelClassModalOpen, setCancelClassModalOpen] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
   const [noteText, setNoteText] = useState("");
+  const [isClassCancelled, setIsClassCancelled] = useState(cancelledClassesStore.isCancelled(classDateId));
 
   if (!classDate) return null;
 
@@ -382,9 +384,17 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
                   });
                   return;
                 }
+                // Update the shared store
+                cancelledClassesStore.cancel(
+                  classDateId, 
+                  classDate.courseId, 
+                  cancellationReason, 
+                  "Dr. Somchai Prasert"
+                );
+                setIsClassCancelled(true);
                 toast({
                   title: "Class Cancelled",
-                  description: "The class has been cancelled and the reason has been logged.",
+                  description: "The class has been cancelled and students will be notified.",
                 });
                 setCancelClassModalOpen(false);
                 setCancellationReason("");
