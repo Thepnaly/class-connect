@@ -222,9 +222,12 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
             <div className="flex items-center gap-3">
               {/* Countdown Timer Display */}
               {isCheckInActive && timeRemaining !== null && (
-                <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-lg border border-primary/20">
-                  <Timer className="h-5 w-5 text-primary animate-pulse" />
-                  <span className="text-2xl font-mono font-bold text-primary">
+                <div className="flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-primary/15 to-info/10 rounded-xl border border-primary/30 shadow-lg shadow-primary/10">
+                  <Timer className="h-6 w-6 text-primary animate-pulse" />
+                  <span 
+                    className="text-3xl font-bold text-primary tracking-wider"
+                    style={{ fontFamily: "'JetBrains Mono', 'Roboto Mono', 'Fira Code', monospace" }}
+                  >
                     {formatTime(timeRemaining)}
                   </span>
                 </div>
