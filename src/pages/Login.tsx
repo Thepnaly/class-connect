@@ -92,16 +92,13 @@ export default function Login() {
             <div className="flex items-center justify-center w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm mb-8">
               <GraduationCap className="h-14 w-14 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-center mb-4">
+            <h1 className="text-4xl font-bold text-center mb-2">
               Faculty of Engineering
             </h1>
-            <p className="text-xl text-center text-white/90 mb-2">
-              Computer Engineering and Information Technology Department
+            <p className="text-lg text-center text-white/80 font-medium">
+              Computer Engineering & Information Technology Department
             </p>
             <div className="w-24 h-1 bg-white/50 rounded-full my-6" />
-            <h2 className="text-2xl font-semibold text-center">
-              CEIT Attendance System
-            </h2>
             <p className="text-white/70 text-center mt-4 max-w-md">
               Streamlined attendance management for students and faculty members
             </p>
@@ -120,13 +117,13 @@ export default function Login() {
                 Faculty of Engineering
               </h1>
               <p className="text-muted-foreground text-sm mt-1">
-                CEIT Attendance System
+                Computer Engineering & Information Technology Department
               </p>
             </div>
 
             <Card className="shadow-lg border-border/50">
               <CardHeader className="space-y-1 text-center">
-                <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
+                <CardTitle className="text-2xl font-bold">CEIT Attendance System</CardTitle>
                 <CardDescription>
                   Enter your credentials to access your dashboard
                 </CardDescription>
