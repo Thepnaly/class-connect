@@ -1,26 +1,27 @@
 import { useState } from "react";
-import { AdminSidebar, AdminView } from "./AdminSidebar";
-import { AdminOverview } from "./AdminOverview";
-import { AdminReports } from "./AdminReports";
+import { HodSidebar, HodView } from "./HodSidebar";
+import { HodOverview } from "./HodOverview";
+import { AdminReports } from "../admin/AdminReports";
 
-export function AdminDashboard() {
-  const [currentView, setCurrentView] = useState<AdminView>("dashboard");
+export function HodDashboard() {
+  const [currentView, setCurrentView] = useState<HodView>("dashboard");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const renderContent = () => {
     switch (currentView) {
       case "dashboard":
-        return <AdminOverview />;
+        return <HodOverview />;
       case "reports":
+        // Re-use the exact same Admin Reports component
         return <AdminReports />;
       default:
-        return <AdminOverview />;
+        return <HodOverview />;
     }
   };
 
   return (
     <div className="flex min-h-[calc(100vh-64px)]">
-      <AdminSidebar
+      <HodSidebar
         currentView={currentView}
         onViewChange={setCurrentView}
         isCollapsed={isSidebarCollapsed}

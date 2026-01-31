@@ -13,9 +13,10 @@ const DUMMY_CREDENTIALS = {
   teacher: { username: "teacher001", password: "password123", name: "Dr. Somchai Prasert" },
   student: { username: "64010123", password: "password123", name: "Nattapong Wongchai" },
   admin: { username: "admin", password: "admin123", name: "System Administrator" },
+  hod: { username: "hod", password: "hod123", name: "Assoc. Prof. Dr. Waraporn Narongrit" },
 };
 
-type UserRole = "teacher" | "student" | "admin";
+type UserRole = "teacher" | "student" | "admin" | "hod";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -233,6 +234,13 @@ export default function Login() {
                   >
                     <span className="text-sm font-medium text-foreground">Admin</span>
                     <code className="text-xs text-primary">admin / admin123</code>
+                  </div>
+                  <div 
+                    className="flex justify-between items-center p-3 rounded-lg border border-border bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
+                    onClick={() => { setUsername("hod"); setPassword("hod123"); }}
+                  >
+                    <span className="text-sm font-medium text-foreground">Head of Dept</span>
+                    <code className="text-xs text-primary">hod / hod123</code>
                   </div>
                 </div>
               </CardContent>

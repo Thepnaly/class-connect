@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 
-type UserRole = "teacher" | "student" | "admin";
+type UserRole = "teacher" | "student" | "admin" | "hod";
 
 interface HeaderProps {
   currentRole: UserRole;
@@ -48,6 +48,8 @@ export function Header({ currentRole, userName = "User", onLogout }: HeaderProps
         return { label: "Student", color: "bg-info text-info-foreground" };
       case "admin":
         return { label: "Administrator", color: "bg-destructive text-destructive-foreground" };
+      case "hod":
+        return { label: "Head of Department", color: "bg-warning text-warning-foreground" };
       default:
         return { label: "User", color: "bg-muted text-muted-foreground" };
     }
