@@ -7,28 +7,26 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export type AdminView =
-  | "dashboard"
-  | "reports";
+export type HodView = "dashboard" | "reports";
 
-interface AdminSidebarProps {
-  currentView: AdminView;
-  onViewChange: (view: AdminView) => void;
+interface HodSidebarProps {
+  currentView: HodView;
+  onViewChange: (view: HodView) => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
 }
 
 const menuItems = [
-  { id: "dashboard" as AdminView, label: "Dashboard", icon: LayoutDashboard },
-  { id: "reports" as AdminView, label: "Reports", icon: BarChart3 },
+  { id: "dashboard" as HodView, label: "Dashboard", icon: LayoutDashboard },
+  { id: "reports" as HodView, label: "Reports", icon: BarChart3 },
 ];
 
-export function AdminSidebar({
+export function HodSidebar({
   currentView,
   onViewChange,
   isCollapsed,
   onToggleCollapse,
-}: AdminSidebarProps) {
+}: HodSidebarProps) {
   return (
     <aside
       className={cn(

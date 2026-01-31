@@ -4,9 +4,10 @@ import { Header } from "@/components/layout/Header";
 import { TeacherDashboard } from "@/components/teacher/TeacherDashboard";
 import { StudentDashboard } from "@/components/student/StudentDashboard";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
+import { HodDashboard } from "@/components/hod/HodDashboard";
 import { Helmet } from "react-helmet-async";
 
-type UserRole = "teacher" | "student" | "admin";
+type UserRole = "teacher" | "student" | "admin" | "hod";
 
 interface AuthUser {
   role: UserRole;
@@ -51,6 +52,8 @@ export default function Dashboard() {
         return <StudentDashboard />;
       case "admin":
         return <AdminDashboard />;
+      case "hod":
+        return <HodDashboard />;
       default:
         return <TeacherDashboard />;
     }
@@ -64,6 +67,8 @@ export default function Dashboard() {
         return "Student Dashboard";
       case "admin":
         return "Admin Dashboard";
+      case "hod":
+        return "Head of Department Dashboard";
       default:
         return "Dashboard";
     }
