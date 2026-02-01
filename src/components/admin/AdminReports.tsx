@@ -49,16 +49,16 @@ const teachingFrequencyData = [
 
 // Instructor performance data with detailed columns (grouped by instructor)
 const instructorPerformanceData = [
-  { id: "1", courseName: "Data Structures and Algorithms", instructorName: "Dr. Piyawat Lertsithichai", section: "4COM1", actualHours: 48, atRiskCount: 2, attendanceCount: 42, droppedCount: 1, resignedCount: 0, checkInMethod: "Face", edited: true, editedOn: "Oct 12, 10:45", studentsModified: 3 },
-  { id: "2", courseName: "Data Structures and Algorithms", instructorName: "Dr. Piyawat Lertsithichai", section: "4COM2", actualHours: 48, atRiskCount: 3, attendanceCount: 40, droppedCount: 2, resignedCount: 0, checkInMethod: "Code", edited: true, editedOn: "Oct 10, 14:30", studentsModified: 5 },
-  { id: "3", courseName: "Database Management Systems", instructorName: "Dr. Piyawat Lertsithichai", section: "4IT_1", actualHours: 45, atRiskCount: 1, attendanceCount: 44, droppedCount: 0, resignedCount: 1, checkInMethod: "Face", edited: true, editedOn: "Oct 8, 16:20", studentsModified: 2 },
-  { id: "4", courseName: "Web Application Development", instructorName: "Assoc. Prof. Waraporn Narongrit", section: "4IT_1", actualHours: 48, atRiskCount: 1, attendanceCount: 44, droppedCount: 0, resignedCount: 1, checkInMethod: "Code", edited: false, editedOn: null, studentsModified: 0 },
-  { id: "5", courseName: "Web Application Development", instructorName: "Assoc. Prof. Waraporn Narongrit", section: "4IT_2", actualHours: 45, atRiskCount: 2, attendanceCount: 41, droppedCount: 1, resignedCount: 0, checkInMethod: "Manual", edited: true, editedOn: "Oct 12, 09:15", studentsModified: 3 },
-  { id: "6", courseName: "Software Engineering", instructorName: "Dr. Chaiwat Suttipong", section: "4COM1", actualHours: 42, atRiskCount: 4, attendanceCount: 38, droppedCount: 2, resignedCount: 1, checkInMethod: "Face", edited: false, editedOn: null, studentsModified: 0 },
-  { id: "7", courseName: "Computer Networks", instructorName: "Asst. Prof. Napat Thongrak", section: "3COM1", actualHours: 21, atRiskCount: 8, attendanceCount: 30, droppedCount: 5, resignedCount: 3, checkInMethod: "Code", edited: false, editedOn: null, studentsModified: 0 },
-  { id: "8", courseName: "System Analysis", instructorName: "Dr. Kanya Rattanakul", section: "3IT_1", actualHours: 48, atRiskCount: 0, attendanceCount: 45, droppedCount: 0, resignedCount: 0, checkInMethod: "Face", edited: false, editedOn: null, studentsModified: 0 },
-  { id: "9", courseName: "Operating Systems", instructorName: "Dr. Prasit Suksawat", section: "3COM2", actualHours: 45, atRiskCount: 2, attendanceCount: 43, droppedCount: 1, resignedCount: 0, checkInMethod: "Manual", edited: false, editedOn: null, studentsModified: 0 },
-  { id: "10", courseName: "Artificial Intelligence", instructorName: "Dr. Arisa Petcharat", section: "4IT_2", actualHours: 48, atRiskCount: 1, attendanceCount: 42, droppedCount: 0, resignedCount: 0, checkInMethod: "Face", edited: false, editedOn: null, studentsModified: 0 },
+  { id: "1", courseName: "Data Structures and Algorithms", instructorName: "Dr. Piyawat Lertsithichai", section: "4COM1", actualHours: 48, atRiskCount: 2, attendanceCount: 42, droppedCount: 1, resignedCount: 0, checkInMethod: "Face", edited: true, editedOn: "Oct 12, 10:45", studentsModified: 3, editorRole: "teacher" as const },
+  { id: "2", courseName: "Data Structures and Algorithms", instructorName: "Dr. Piyawat Lertsithichai", section: "4COM2", actualHours: 48, atRiskCount: 3, attendanceCount: 40, droppedCount: 2, resignedCount: 0, checkInMethod: "Code", edited: true, editedOn: "Oct 10, 14:30", studentsModified: 5, editorRole: "admin" as const },
+  { id: "3", courseName: "Database Management Systems", instructorName: "Dr. Piyawat Lertsithichai", section: "4IT_1", actualHours: 45, atRiskCount: 1, attendanceCount: 44, droppedCount: 0, resignedCount: 1, checkInMethod: "Face", edited: true, editedOn: "Oct 8, 16:20", studentsModified: 2, editorRole: "teacher" as const },
+  { id: "4", courseName: "Web Application Development", instructorName: "Assoc. Prof. Waraporn Narongrit", section: "4IT_1", actualHours: 48, atRiskCount: 1, attendanceCount: 44, droppedCount: 0, resignedCount: 1, checkInMethod: "Code", edited: false, editedOn: null, studentsModified: 0, editorRole: null },
+  { id: "5", courseName: "Web Application Development", instructorName: "Assoc. Prof. Waraporn Narongrit", section: "4IT_2", actualHours: 45, atRiskCount: 2, attendanceCount: 41, droppedCount: 1, resignedCount: 0, checkInMethod: "Manual", edited: true, editedOn: "Oct 12, 09:15", studentsModified: 3, editorRole: "admin" as const },
+  { id: "6", courseName: "Software Engineering", instructorName: "Dr. Chaiwat Suttipong", section: "4COM1", actualHours: 42, atRiskCount: 4, attendanceCount: 38, droppedCount: 2, resignedCount: 1, checkInMethod: "Face", edited: false, editedOn: null, studentsModified: 0, editorRole: null },
+  { id: "7", courseName: "Computer Networks", instructorName: "Asst. Prof. Napat Thongrak", section: "3COM1", actualHours: 21, atRiskCount: 8, attendanceCount: 30, droppedCount: 5, resignedCount: 3, checkInMethod: "Code", edited: false, editedOn: null, studentsModified: 0, editorRole: null },
+  { id: "8", courseName: "System Analysis", instructorName: "Dr. Kanya Rattanakul", section: "3IT_1", actualHours: 48, atRiskCount: 0, attendanceCount: 45, droppedCount: 0, resignedCount: 0, checkInMethod: "Face", edited: false, editedOn: null, studentsModified: 0, editorRole: null },
+  { id: "9", courseName: "Operating Systems", instructorName: "Dr. Prasit Suksawat", section: "3COM2", actualHours: 45, atRiskCount: 2, attendanceCount: 43, droppedCount: 1, resignedCount: 0, checkInMethod: "Manual", edited: false, editedOn: null, studentsModified: 0, editorRole: null },
+  { id: "10", courseName: "Artificial Intelligence", instructorName: "Dr. Arisa Petcharat", section: "4IT_2", actualHours: 48, atRiskCount: 1, attendanceCount: 42, droppedCount: 0, resignedCount: 0, checkInMethod: "Face", edited: false, editedOn: null, studentsModified: 0, editorRole: null },
 ];
 
 // Group instructors for row grouping
@@ -190,8 +190,8 @@ const reports = [
   },
 ];
 
-// Mock audit history data - multiple dates with edits
-const auditHistoryData: Record<string, { date: string; displayDate: string; studentsModified: number; students: Array<{ id: string; studentCode: string; name: string; status: string; time: string; edited: boolean }> }[]> = {
+// Mock audit history data - multiple dates with edits (now includes editor role)
+const auditHistoryData: Record<string, { date: string; displayDate: string; studentsModified: number; students: Array<{ id: string; studentCode: string; name: string; status: string; time: string; edited: boolean; editorRole?: 'admin' | 'teacher' }> }[]> = {
   "4COM1": [
     {
       date: "2024-10-12",
@@ -200,12 +200,12 @@ const auditHistoryData: Record<string, { date: string; displayDate: string; stud
       students: [
         { id: "1", studentCode: "65070001", name: "Somsak Prasert", status: "present", time: "09:05", edited: false },
         { id: "2", studentCode: "65070002", name: "Wilawan Thongchai", status: "present", time: "09:02", edited: false },
-        { id: "3", studentCode: "65070003", name: "Kittipong Somjai", status: "late", time: "09:25", edited: true },
+        { id: "3", studentCode: "65070003", name: "Kittipong Somjai", status: "late", time: "09:25", edited: true, editorRole: "teacher" },
         { id: "4", studentCode: "65070004", name: "Pranee Rattana", status: "present", time: "09:01", edited: false },
-        { id: "5", studentCode: "65070005", name: "Thanawat Khunpol", status: "absent", time: "-", edited: true },
+        { id: "5", studentCode: "65070005", name: "Thanawat Khunpol", status: "absent", time: "-", edited: true, editorRole: "admin" },
         { id: "6", studentCode: "65070006", name: "Napat Suksawat", status: "present", time: "09:03", edited: false },
         { id: "7", studentCode: "65070007", name: "Arisa Wongsiri", status: "present", time: "09:00", edited: false },
-        { id: "8", studentCode: "65070008", name: "Chaiwat Tanaka", status: "excused", time: "-", edited: true },
+        { id: "8", studentCode: "65070008", name: "Chaiwat Tanaka", status: "excused", time: "-", edited: true, editorRole: "teacher" },
         { id: "9", studentCode: "65070009", name: "Kanya Petcharat", status: "present", time: "09:04", edited: false },
         { id: "10", studentCode: "65070010", name: "Prasit Lertsithichai", status: "present", time: "09:06", edited: false },
       ]
@@ -216,11 +216,11 @@ const auditHistoryData: Record<string, { date: string; displayDate: string; stud
       studentsModified: 2,
       students: [
         { id: "1", studentCode: "65070001", name: "Somsak Prasert", status: "present", time: "09:00", edited: false },
-        { id: "2", studentCode: "65070002", name: "Wilawan Thongchai", status: "late", time: "09:18", edited: true },
+        { id: "2", studentCode: "65070002", name: "Wilawan Thongchai", status: "late", time: "09:18", edited: true, editorRole: "admin" },
         { id: "3", studentCode: "65070003", name: "Kittipong Somjai", status: "present", time: "09:02", edited: false },
         { id: "4", studentCode: "65070004", name: "Pranee Rattana", status: "present", time: "09:01", edited: false },
         { id: "5", studentCode: "65070005", name: "Thanawat Khunpol", status: "present", time: "09:05", edited: false },
-        { id: "6", studentCode: "65070006", name: "Napat Suksawat", status: "excused", time: "-", edited: true },
+        { id: "6", studentCode: "65070006", name: "Napat Suksawat", status: "excused", time: "-", edited: true, editorRole: "teacher" },
         { id: "7", studentCode: "65070007", name: "Arisa Wongsiri", status: "present", time: "09:03", edited: false },
         { id: "8", studentCode: "65070008", name: "Chaiwat Tanaka", status: "present", time: "09:04", edited: false },
         { id: "9", studentCode: "65070009", name: "Kanya Petcharat", status: "present", time: "09:01", edited: false },
@@ -234,14 +234,14 @@ const auditHistoryData: Record<string, { date: string; displayDate: string; stud
       displayDate: "October 10, 2024",
       studentsModified: 5,
       students: [
-        { id: "1", studentCode: "65070011", name: "Somchai Jaidee", status: "late", time: "09:20", edited: true },
+        { id: "1", studentCode: "65070011", name: "Somchai Jaidee", status: "late", time: "09:20", edited: true, editorRole: "teacher" },
         { id: "2", studentCode: "65070012", name: "Nattaya Sombat", status: "present", time: "09:02", edited: false },
-        { id: "3", studentCode: "65070013", name: "Wichai Korn", status: "absent", time: "-", edited: true },
-        { id: "4", studentCode: "65070014", name: "Suporn Chai", status: "excused", time: "-", edited: true },
+        { id: "3", studentCode: "65070013", name: "Wichai Korn", status: "absent", time: "-", edited: true, editorRole: "admin" },
+        { id: "4", studentCode: "65070014", name: "Suporn Chai", status: "excused", time: "-", edited: true, editorRole: "teacher" },
         { id: "5", studentCode: "65070015", name: "Narong Suk", status: "present", time: "09:05", edited: false },
-        { id: "6", studentCode: "65070016", name: "Pakorn Wang", status: "late", time: "09:25", edited: true },
+        { id: "6", studentCode: "65070016", name: "Pakorn Wang", status: "late", time: "09:25", edited: true, editorRole: "admin" },
         { id: "7", studentCode: "65070017", name: "Siriporn Lee", status: "present", time: "09:00", edited: false },
-        { id: "8", studentCode: "65070018", name: "Thawee Prasit", status: "absent", time: "-", edited: true },
+        { id: "8", studentCode: "65070018", name: "Thawee Prasit", status: "absent", time: "-", edited: true, editorRole: "teacher" },
       ]
     }
   ],
@@ -252,23 +252,27 @@ const auditHistoryData: Record<string, { date: string; displayDate: string; stud
       studentsModified: 2,
       students: [
         { id: "1", studentCode: "65070021", name: "Kamon Rattana", status: "present", time: "09:00", edited: false },
-        { id: "2", studentCode: "65070022", name: "Suwanna Chai", status: "late", time: "09:15", edited: true },
+        { id: "2", studentCode: "65070022", name: "Suwanna Chai", status: "late", time: "09:15", edited: true, editorRole: "teacher" },
         { id: "3", studentCode: "65070023", name: "Boonchai Wang", status: "present", time: "09:02", edited: false },
-        { id: "4", studentCode: "65070024", name: "Malai Suk", status: "excused", time: "-", edited: true },
+        { id: "4", studentCode: "65070024", name: "Malai Suk", status: "excused", time: "-", edited: true, editorRole: "admin" },
       ]
     }
   ],
 };
 
-export function AdminReports() {
-  const [atRiskDialogOpen, setAtRiskDialogOpen] = useState(false);
+interface AdminReportsProps {
+  initialFilter?: { lowAttendance?: boolean };
+}
+
+export function AdminReports({ initialFilter }: AdminReportsProps = {}) {
+  const [atRiskDialogOpen, setAtRiskDialogOpen] = useState(initialFilter?.lowAttendance || false);
   const [selectedYear, setSelectedYear] = useState("2025");
   const [selectedSemester, setSelectedSemester] = useState("1");
-  const [compareYear, setCompareYear] = useState("2024");
+  const [compareYear, setCompareYear] = useState<string | null>(null);
   const [auditHistoryModalOpen, setAuditHistoryModalOpen] = useState(false);
   const [classDetailModalOpen, setClassDetailModalOpen] = useState(false);
   const [selectedAuditSection, setSelectedAuditSection] = useState<string | null>(null);
-  const [selectedAuditDate, setSelectedAuditDate] = useState<{ date: string; displayDate: string; studentsModified: number; students: Array<{ id: string; studentCode: string; name: string; status: string; time: string; edited: boolean }> } | null>(null);
+  const [selectedAuditDate, setSelectedAuditDate] = useState<{ date: string; displayDate: string; studentsModified: number; students: Array<{ id: string; studentCode: string; name: string; status: string; time: string; edited: boolean; editorRole?: 'admin' | 'teacher' }> } | null>(null);
 
   const handleAuditBadgeClick = (section: string) => {
     setSelectedAuditSection(section);
@@ -313,7 +317,7 @@ export function AdminReports() {
           <p className="text-muted-foreground mt-1">CEIT Department Report Center</p>
         </div>
         
-        {/* Year/Semester Selector */}
+        {/* Year/Semester Selector - No Compare dropdown */}
         <div className="flex items-center gap-3 bg-muted/30 p-3 rounded-lg border">
           <Calendar className="h-5 w-5 text-muted-foreground" />
           <div className="flex items-center gap-2">
@@ -338,19 +342,6 @@ export function AdminReports() {
               <SelectContent>
                 <SelectItem value="1">1</SelectItem>
                 <SelectItem value="2">2</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-center gap-2 border-l pl-3 ml-2">
-            <span className="text-sm text-muted-foreground">Compare:</span>
-            <Select value={compareYear} onValueChange={setCompareYear}>
-              <SelectTrigger className="w-24 h-8">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="2022">2022</SelectItem>
-                <SelectItem value="2023">2023</SelectItem>
-                <SelectItem value="2024">2024</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -510,55 +501,76 @@ export function AdminReports() {
                                 </Card>
                               </div>
 
-                              {/* Year Comparison Bar Chart */}
-                              {compareYear && compareYear !== selectedYear && (
-                                <Card className="p-4">
-                                  <h4 className="font-semibold mb-4 flex items-center gap-2">
+                              {/* Year Comparison Section - Only inside this report */}
+                              <Card className="p-4">
+                                <div className="flex items-center justify-between mb-4">
+                                  <h4 className="font-semibold flex items-center gap-2">
                                     <BarChart3 className="h-5 w-5 text-info" />
-                                    Year Comparison: {selectedYear} vs {compareYear}
+                                    Year-over-Year Comparison
                                   </h4>
-                                  <div className="h-80">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                      <BarChart 
-                                        data={[
-                                          { section: "4COM1", current: 92, compare: 88 },
-                                          { section: "4COM2", current: 88, compare: 85 },
-                                          { section: "4IT_1", current: 85, compare: 82 },
-                                          { section: "4IT_2", current: 78, compare: 75 },
-                                          { section: "3COM1", current: 75, compare: 80 },
-                                          { section: "3COM2", current: 90, compare: 86 },
-                                          { section: "3IT_1", current: 82, compare: 79 },
-                                          { section: "3IT_2", current: 55, compare: 60 },
-                                        ]} 
-                                        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                                      >
-                                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                                        <XAxis dataKey="section" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                                        <YAxis stroke="hsl(var(--muted-foreground))" domain={[0, 100]} />
-                                        <Tooltip 
-                                          contentStyle={{ 
-                                            backgroundColor: "hsl(var(--card))", 
-                                            border: "1px solid hsl(var(--border))",
-                                            borderRadius: "8px"
-                                          }}
-                                          formatter={(value: number, name: string) => [
-                                            `${value}%`,
-                                            name === 'current' ? `${selectedYear}` : `${compareYear}`
-                                          ]}
-                                        />
-                                        <Legend 
-                                          formatter={(value) => value === 'current' ? `${selectedYear}` : `${compareYear}`}
-                                        />
-                                        <Bar dataKey="current" fill="hsl(221, 83%, 53%)" name="current" radius={[4, 4, 0, 0]} />
-                                        <Bar dataKey="compare" fill="hsl(var(--muted-foreground))" name="compare" radius={[4, 4, 0, 0]} />
-                                      </BarChart>
-                                    </ResponsiveContainer>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm text-muted-foreground">Compare with:</span>
+                                    <Select value={compareYear || ""} onValueChange={(val) => setCompareYear(val || null)}>
+                                      <SelectTrigger className="w-28 h-8">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="2022">2022</SelectItem>
+                                        <SelectItem value="2023">2023</SelectItem>
+                                        <SelectItem value="2024">2024</SelectItem>
+                                      </SelectContent>
+                                    </Select>
                                   </div>
-                                  <p className="text-sm text-muted-foreground text-center mt-2">
-                                    Side-by-side attendance rate comparison by section
-                                  </p>
-                                </Card>
-                              )}
+                                </div>
+                                {compareYear && compareYear !== selectedYear ? (
+                                  <>
+                                    <div className="h-80">
+                                      <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart 
+                                          data={[
+                                            { section: "4COM1", current: 92, compare: 88 },
+                                            { section: "4COM2", current: 88, compare: 85 },
+                                            { section: "4IT_1", current: 85, compare: 82 },
+                                            { section: "4IT_2", current: 78, compare: 75 },
+                                            { section: "3COM1", current: 75, compare: 80 },
+                                            { section: "3COM2", current: 90, compare: 86 },
+                                            { section: "3IT_1", current: 82, compare: 79 },
+                                            { section: "3IT_2", current: 55, compare: 60 },
+                                          ]} 
+                                          margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                                        >
+                                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                          <XAxis dataKey="section" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                                          <YAxis stroke="hsl(var(--muted-foreground))" domain={[0, 100]} />
+                                          <Tooltip 
+                                            contentStyle={{ 
+                                              backgroundColor: "hsl(var(--card))", 
+                                              border: "1px solid hsl(var(--border))",
+                                              borderRadius: "8px"
+                                            }}
+                                            formatter={(value: number, name: string) => [
+                                              `${value}%`,
+                                              name === 'current' ? `${selectedYear}` : `${compareYear}`
+                                            ]}
+                                          />
+                                          <Legend 
+                                            formatter={(value) => value === 'current' ? `${selectedYear}` : `${compareYear}`}
+                                          />
+                                          <Bar dataKey="current" fill="hsl(221, 83%, 53%)" name="current" radius={[4, 4, 0, 0]} />
+                                          <Bar dataKey="compare" fill="hsl(var(--muted-foreground))" name="compare" radius={[4, 4, 0, 0]} />
+                                        </BarChart>
+                                      </ResponsiveContainer>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground text-center mt-2">
+                                      Side-by-side attendance rate comparison by section
+                                    </p>
+                                  </>
+                                ) : (
+                                  <div className="h-40 flex items-center justify-center text-muted-foreground border-2 border-dashed rounded-lg">
+                                    <p>Select a comparison year to view the chart</p>
+                                  </div>
+                                )}
+                              </Card>
                             </div>
                           )}
 
@@ -823,31 +835,37 @@ export function AdminReports() {
                                               </Badge>
                                             </TableCell>
                                             <TableCell className={`text-center ${rowIndex > 0 ? "border-t-0" : ""}`}>
-                                              {row.edited ? (
+                                              {row.edited && row.editorRole ? (
                                                 <TooltipProvider delayDuration={0}>
                                                   <ShadcnTooltip>
                                                     <TooltipTrigger asChild>
                                                       <Badge 
-                                                        className="text-xs gap-1.5 cursor-pointer transition-all duration-200 bg-sky-100 text-sky-700 border border-sky-300 hover:bg-sky-200 hover:border-sky-400 hover:shadow-md dark:bg-sky-900/40 dark:text-sky-300 dark:border-sky-700 dark:hover:bg-sky-900/60"
+                                                        className={`text-xs gap-1.5 cursor-pointer transition-all duration-200 ${
+                                                          row.editorRole === 'admin' 
+                                                            ? "bg-destructive/20 text-destructive border border-destructive/50 hover:bg-destructive/30 hover:border-destructive hover:shadow-md dark:bg-destructive/30 dark:text-red-300 dark:border-destructive/60"
+                                                            : "bg-primary/20 text-primary border border-primary/50 hover:bg-primary/30 hover:border-primary hover:shadow-md dark:bg-primary/30 dark:text-blue-300 dark:border-primary/60"
+                                                        }`}
                                                         onClick={() => handleAuditBadgeClick(row.section)}
                                                       >
                                                         <Pencil className="h-3 w-3" />
-                                                        Edited by Teacher
+                                                        {row.editorRole === 'admin' ? 'Edited by Admin' : 'Edited by Teacher'}
                                                       </Badge>
                                                     </TooltipTrigger>
                                                     <TooltipContent 
                                                       side="top" 
-                                                      className="bg-popover border-2 border-sky-200 p-3 shadow-xl rounded-lg dark:border-sky-800"
+                                                      className={`bg-popover border-2 p-3 shadow-xl rounded-lg ${
+                                                        row.editorRole === 'admin' ? 'border-destructive/40' : 'border-primary/40'
+                                                      }`}
                                                     >
                                                       <div className="text-sm">
                                                         <div className="flex items-center gap-2 mb-1">
-                                                          <History className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
+                                                          <History className={`h-3.5 w-3.5 ${row.editorRole === 'admin' ? 'text-destructive' : 'text-primary'}`} />
                                                           <p className="font-semibold text-foreground">Edit History Available</p>
                                                         </div>
                                                         <p className="text-muted-foreground">
                                                           {auditHistoryData[row.section]?.length || 0} date(s) with modifications
                                                         </p>
-                                                        <p className="text-xs text-sky-600 mt-1 font-medium dark:text-sky-400">
+                                                        <p className={`text-xs mt-1 font-medium ${row.editorRole === 'admin' ? 'text-destructive' : 'text-primary'}`}>
                                                           Click to view edit history →
                                                         </p>
                                                       </div>
@@ -1254,9 +1272,15 @@ export function AdminReports() {
                       <TableCell className="text-center font-mono">{student.time}</TableCell>
                       <TableCell className="text-center">
                         {student.edited && (
-                          <Badge className="text-xs gap-1 bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-900/40 dark:text-yellow-300 dark:border-yellow-700">
+                          <Badge 
+                            className={`text-xs gap-1 ${
+                              student.editorRole === 'admin'
+                                ? "bg-destructive/20 text-destructive border border-destructive/50 dark:bg-destructive/30 dark:text-red-300"
+                                : "bg-primary/20 text-primary border border-primary/50 dark:bg-primary/30 dark:text-blue-300"
+                            }`}
+                          >
                             <Pencil className="h-2.5 w-2.5" />
-                            Edited
+                            {student.editorRole === 'admin' ? 'Admin' : 'Teacher'}
                           </Badge>
                         )}
                       </TableCell>
