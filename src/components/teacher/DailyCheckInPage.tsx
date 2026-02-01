@@ -60,6 +60,7 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
   const [cancellationReason, setCancellationReason] = useState("");
   const [noteText, setNoteText] = useState("");
   const [isClassCancelled, setIsClassCancelled] = useState(cancelledClassesStore.isCancelled(classDateId));
+  const [sessionNote, setSessionNote] = useState(""); // Class session notes
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Countdown timer effect
@@ -456,6 +457,42 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
               })}
             </TableBody>
           </Table>
+        </CardContent>
+      </Card>
+
+      {/* Class Session Notes Section */}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <MessageSquare className="h-5 w-5 text-primary" />
+            Class Session Notes
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <Textarea
+              placeholder="Write notes about this class session (e.g., topics covered, equipment issues, exam topics, reasons for cancellation...)"
+              value={sessionNote}
+              onChange={(e) => setSessionNote(e.target.value)}
+              className="min-h-[120px] resize-none"
+            />
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">
+                This note will be saved to the session_note field in tb_class_session
+              </p>
+              <Button 
+                onClick={() => {
+                  toast({
+                    title: "Note Saved",
+                    description: "Class session notes have been saved successfully.",
+                  });
+                }}
+                disabled={!sessionNote.trim()}
+              >
+                Save Note
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

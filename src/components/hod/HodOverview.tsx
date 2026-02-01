@@ -1,24 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { 
   TrendingUp, 
   Users, 
   AlertTriangle, 
-  FileBarChart,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  ChevronRight
 } from "lucide-react";
 import {
   LineChart,
   Line,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend
 } from "recharts";
 
 // Weekly attendance trend data
@@ -32,22 +28,22 @@ const weeklyTrendData = [
   { day: "Sun", attendance: 0 },
 ];
 
-// Attendance by subject data
-const subjectAttendanceData = [
-  { subject: "Data Structures", rate: 92, color: "hsl(var(--primary))" },
-  { subject: "Web Dev", rate: 88, color: "hsl(var(--info))" },
-  { subject: "Networks", rate: 75, color: "hsl(var(--warning))" },
-  { subject: "Database", rate: 90, color: "hsl(var(--success))" },
-  { subject: "Software Eng", rate: 85, color: "hsl(var(--primary))" },
-  { subject: "OS", rate: 82, color: "hsl(var(--info))" },
-];
+interface HodOverviewProps {
+  onNavigateToReports?: (filter?: { lowAttendance?: boolean }) => void;
+}
 
-export function HodOverview() {
+export function HodOverview({ onNavigateToReports }: HodOverviewProps) {
   const kpiStats = {
     todayAttendance: 92,
     attendanceTrend: +2.5,
     activeClasses: 8,
     lowAttendanceAlerts: 3,
+  };
+
+  const handleLowAttendanceClick = () => {
+    if (onNavigateToReports) {
+      onNavigateToReports({ lowAttendance: true });
+    }
   };
 
   return (
@@ -97,8 +93,11 @@ export function HodOverview() {
           </CardContent>
         </Card>
 
-        {/* Low Attendance Alerts */}
-        <Card className="card-hover border-l-4 border-l-destructive">
+        {/* Low Attendance Alerts - Clickable */}
+        <Card 
+          className="card-hover border-l-4 border-l-destructive cursor-pointer transition-all hover:shadow-md hover:border-destructive/50 group"
+          onClick={handleLowAttendanceClick}
+        >
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -112,127 +111,57 @@ export function HodOverview() {
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">Below 80% threshold</p>
               </div>
-              <div className="h-14 w-14 rounded-xl bg-destructive/10 flex items-center justify-center">
-                <AlertTriangle className="h-7 w-7 text-destructive" />
+              <div className="flex items-center gap-2">
+                <div className="h-14 w-14 rounded-xl bg-destructive/10 flex items-center justify-center">
+                  <AlertTriangle className="h-7 w-7 text-destructive" />
+                </div>
+                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-destructive group-hover:translate-x-1 transition-all" />
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Charts Section */}
-      <div className="grid gap-6 md:grid-cols-2 mb-8">
-        {/* Weekly Attendance Trends - Line Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Weekly Attendance Trends</CardTitle>
-            <CardDescription>Daily attendance percentage this week</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[280px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={weeklyTrendData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis 
-                    dataKey="day" 
-                    className="text-xs"
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                  />
-                  <YAxis 
-                    domain={[0, 100]}
-                    className="text-xs"
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                    tickFormatter={(value) => `${value}%`}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [`${value}%`, 'Attendance']}
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="attendance" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={3}
-                    dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, fill: 'hsl(var(--primary))' }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Attendance by Subject - Bar Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Attendance by Subject</CardTitle>
-            <CardDescription>Comparison across all courses</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[280px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={subjectAttendanceData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={true} vertical={false} />
-                  <XAxis 
-                    type="number" 
-                    domain={[0, 100]}
-                    className="text-xs"
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                    tickFormatter={(value) => `${value}%`}
-                  />
-                  <YAxis 
-                    type="category" 
-                    dataKey="subject" 
-                    className="text-xs"
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                    width={90}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [`${value}%`, 'Attendance Rate']}
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Bar 
-                    dataKey="rate" 
-                    fill="hsl(var(--primary))"
-                    radius={[0, 4, 4, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Report Access Section */}
-      <Card className="bg-gradient-to-r from-primary/5 to-info/5 border-primary/20">
-        <CardContent className="p-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="h-16 w-16 rounded-xl bg-primary/10 flex items-center justify-center">
-                <FileBarChart className="h-8 w-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold">View Full Detailed Reports</h3>
-                <p className="text-muted-foreground mt-1">
-                  Access comprehensive attendance reports, student analytics, and departmental statistics
-                </p>
-                <p className="text-xs text-muted-foreground mt-2 italic">
-                  Note: This links to the shared Admin Report Module
-                </p>
-              </div>
-            </div>
-            <Button size="lg" className="gap-2">
-              <FileBarChart className="h-5 w-5" />
-              Open Reports
-            </Button>
+      {/* Weekly Attendance Trends - Full Width */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Weekly Attendance Trends</CardTitle>
+          <CardDescription>Daily attendance percentage this week</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[350px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={weeklyTrendData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="day" 
+                  className="text-xs"
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                />
+                <YAxis 
+                  domain={[0, 100]}
+                  className="text-xs"
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  tickFormatter={(value) => `${value}%`}
+                />
+                <Tooltip 
+                  formatter={(value: number) => [`${value}%`, 'Attendance']}
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px'
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="attendance" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={3}
+                  dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, fill: 'hsl(var(--primary))' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </CardContent>
       </Card>
