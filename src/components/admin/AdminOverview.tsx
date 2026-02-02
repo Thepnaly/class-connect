@@ -43,7 +43,11 @@ const mockSessionStudents = [
   { id: "10", studentCode: "65070010", name: "Prasit Lertsithichai", photo: null, checkInTime: "09:06", status: "O" as AttendanceStatus },
 ];
 
-export function AdminOverview() {
+interface AdminOverviewProps {
+  onNavigateToLogs?: (filter: "error" | "warning") => void;
+}
+
+export function AdminOverview({ onNavigateToLogs }: AdminOverviewProps) {
   const [selectedSession, setSelectedSession] = useState<typeof activeSessions[0] | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [sessionStudents, setSessionStudents] = useState(mockSessionStudents);
@@ -54,6 +58,7 @@ export function AdminOverview() {
     totalCameras: 15,
     liveClasses: 3,
     errorCount: 2,
+    warningCount: 5,
   };
 
   const getStatusBadge = (status: string) => {
@@ -107,7 +112,7 @@ export function AdminOverview() {
       </div>
 
       {/* System Status Cards */}
-      <div className="grid gap-4 md:grid-cols-4 mb-8">
+      <div className="grid gap-4 md:grid-cols-5 mb-8">
         {/* API Status */}
         <Card className="card-hover border-success/30">
           <CardContent className="p-6">
@@ -159,12 +164,34 @@ export function AdminOverview() {
         </Card>
 
         {/* Error Logs */}
-        <Card className="card-hover border-warning/30">
+        <Card 
+          className="card-hover border-destructive/30 cursor-pointer transition-all hover:shadow-lg hover:border-destructive/50"
+          onClick={() => onNavigateToLogs?.("error")}
+        >
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Error Logs</p>
-                <p className="text-3xl font-bold text-warning">{systemStats.errorCount}</p>
+                <p className="text-3xl font-bold text-destructive">{systemStats.errorCount}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Errors Today</p>
+              </div>
+              <div className="h-12 w-12 rounded-lg bg-destructive/10 flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6 text-destructive" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Warnings */}
+        <Card 
+          className="card-hover border-warning/30 cursor-pointer transition-all hover:shadow-lg hover:border-warning/50"
+          onClick={() => onNavigateToLogs?.("warning")}
+        >
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Warnings</p>
+                <p className="text-3xl font-bold text-warning">{systemStats.warningCount}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Warnings Today</p>
               </div>
               <div className="h-12 w-12 rounded-lg bg-warning/10 flex items-center justify-center">

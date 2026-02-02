@@ -471,15 +471,12 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
         <CardContent>
           <div className="space-y-4">
             <Textarea
-              placeholder="Write notes about this class session (e.g., topics covered, equipment issues, exam topics, reasons for cancellation...)"
+              placeholder="Write notes about this class session (e.g., topics covered, equipment issues, exam topics...)"
               value={sessionNote}
               onChange={(e) => setSessionNote(e.target.value)}
               className="min-h-[120px] resize-none"
             />
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">
-                This note will be saved to the session_note field in tb_class_session
-              </p>
+            <div className="flex justify-end">
               <Button 
                 onClick={() => {
                   toast({
