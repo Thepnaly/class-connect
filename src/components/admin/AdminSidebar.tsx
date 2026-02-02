@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   BarChart3,
+  FileText,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -9,7 +10,8 @@ import { Button } from "@/components/ui/button";
 
 export type AdminView =
   | "dashboard"
-  | "reports";
+  | "reports"
+  | "logs";
 
 interface AdminSidebarProps {
   currentView: AdminView;
@@ -21,6 +23,7 @@ interface AdminSidebarProps {
 const menuItems = [
   { id: "dashboard" as AdminView, label: "Dashboard", icon: LayoutDashboard },
   { id: "reports" as AdminView, label: "Reports", icon: BarChart3 },
+  { id: "logs" as AdminView, label: "System Logs", icon: FileText },
 ];
 
 export function AdminSidebar({

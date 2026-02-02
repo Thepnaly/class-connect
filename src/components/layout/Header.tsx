@@ -1,4 +1,4 @@
-import { GraduationCap, Bell, LogOut } from "lucide-react";
+import { GraduationCap, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -60,14 +60,6 @@ export function Header({ currentRole, userName = "User", onLogout }: HeaderProps
           <span className={`hidden sm:inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${roleBadge.color}`}>
             {roleBadge.label}
           </span>
-
-          {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] text-destructive-foreground">
-              3
-            </span>
-          </Button>
 
           {/* User Menu */}
           <DropdownMenu>
