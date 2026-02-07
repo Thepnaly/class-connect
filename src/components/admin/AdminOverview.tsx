@@ -8,10 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { 
-  Wifi, 
   Camera, 
   Users, 
-  AlertTriangle, 
   Eye,
   CheckCircle2,
   Clock
@@ -43,22 +41,15 @@ const mockSessionStudents = [
   { id: "10", studentCode: "65070010", name: "Prasit Lertsithichai", photo: null, checkInTime: "09:06", status: "O" as AttendanceStatus },
 ];
 
-interface AdminOverviewProps {
-  onNavigateToLogs?: (filter: "error" | "warning") => void;
-}
-
-export function AdminOverview({ onNavigateToLogs }: AdminOverviewProps) {
+export function AdminOverview() {
   const [selectedSession, setSelectedSession] = useState<typeof activeSessions[0] | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [sessionStudents, setSessionStudents] = useState(mockSessionStudents);
 
   const systemStats = {
-    apiStatus: "connected",
     activeCameras: 12,
     totalCameras: 15,
     liveClasses: 3,
-    errorCount: 2,
-    warningCount: 5,
   };
 
   const getStatusBadge = (status: string) => {
@@ -112,36 +103,18 @@ export function AdminOverview({ onNavigateToLogs }: AdminOverviewProps) {
       </div>
 
       {/* System Status Cards */}
-      <div className="grid gap-4 md:grid-cols-5 mb-8">
-        {/* API Status */}
-        <Card className="card-hover border-success/30">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">API Status</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="w-2.5 h-2.5 rounded-full bg-success animate-pulse" />
-                  <p className="text-xl font-bold text-success">Connected</p>
-                </div>
-              </div>
-              <div className="h-12 w-12 rounded-lg bg-success/10 flex items-center justify-center">
-                <Wifi className="h-6 w-6 text-success" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
+      <div className="grid gap-6 md:grid-cols-2 mb-8 max-w-4xl mx-auto">
         {/* Camera Status */}
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-8">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Camera Status</p>
-                <p className="text-3xl font-bold">{systemStats.activeCameras}<span className="text-lg text-muted-foreground">/{systemStats.totalCameras}</span></p>
-                <p className="text-xs text-muted-foreground mt-0.5">Active Devices</p>
+                <p className="text-4xl font-bold mt-1">{systemStats.activeCameras}<span className="text-xl text-muted-foreground">/{systemStats.totalCameras}</span></p>
+                <p className="text-sm text-muted-foreground mt-1">Active Devices</p>
               </div>
-              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Camera className="h-6 w-6 text-primary" />
+              <div className="h-16 w-16 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Camera className="h-8 w-8 text-primary" />
               </div>
             </div>
           </CardContent>
@@ -149,53 +122,15 @@ export function AdminOverview({ onNavigateToLogs }: AdminOverviewProps) {
 
         {/* Live Classes */}
         <Card className="card-hover">
-          <CardContent className="p-6">
+          <CardContent className="p-8">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Live Classes</p>
-                <p className="text-3xl font-bold text-info">{systemStats.liveClasses}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Ongoing Sessions</p>
+                <p className="text-4xl font-bold text-info mt-1">{systemStats.liveClasses}</p>
+                <p className="text-sm text-muted-foreground mt-1">Ongoing Sessions</p>
               </div>
-              <div className="h-12 w-12 rounded-lg bg-info/10 flex items-center justify-center">
-                <Users className="h-6 w-6 text-info" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Error Logs */}
-        <Card 
-          className="card-hover border-destructive/30 cursor-pointer transition-all hover:shadow-lg hover:border-destructive/50"
-          onClick={() => onNavigateToLogs?.("error")}
-        >
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Error Logs</p>
-                <p className="text-3xl font-bold text-destructive">{systemStats.errorCount}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Errors Today</p>
-              </div>
-              <div className="h-12 w-12 rounded-lg bg-destructive/10 flex items-center justify-center">
-                <AlertTriangle className="h-6 w-6 text-destructive" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Warnings */}
-        <Card 
-          className="card-hover border-warning/30 cursor-pointer transition-all hover:shadow-lg hover:border-warning/50"
-          onClick={() => onNavigateToLogs?.("warning")}
-        >
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Warnings</p>
-                <p className="text-3xl font-bold text-warning">{systemStats.warningCount}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Warnings Today</p>
-              </div>
-              <div className="h-12 w-12 rounded-lg bg-warning/10 flex items-center justify-center">
-                <AlertTriangle className="h-6 w-6 text-warning" />
+              <div className="h-16 w-16 rounded-xl bg-info/10 flex items-center justify-center">
+                <Users className="h-8 w-8 text-info" />
               </div>
             </div>
           </CardContent>
