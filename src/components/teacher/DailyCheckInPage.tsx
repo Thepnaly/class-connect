@@ -64,6 +64,8 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
   const [noteText, setNoteText] = useState("");
   const [isClassCancelled, setIsClassCancelled] = useState(cancelledClassesStore.isCancelled(classDateId));
   const [sessionNote, setSessionNote] = useState(""); // Class session notes
+  const [isStartingSession, setIsStartingSession] = useState(false);
+  const [sessionLocation, setSessionLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Countdown timer effect
