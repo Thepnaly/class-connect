@@ -240,8 +240,18 @@ export function StudentDashboard() {
         {showAiAnimation && !aiCheckInSuccess && (
           <div className="bg-gradient-to-r from-primary/20 via-info/20 to-primary/20 rounded-xl p-6 border border-primary/30 animate-pulse">
             <div className="flex items-center justify-center gap-3">
-              <Scan className="h-8 w-8 text-primary animate-pulse" />
-              <span className="text-lg font-medium">Scanning for facial recognition...</span>
+              {isLocating ? (
+                <>
+                  <MapPin className="h-8 w-8 text-info animate-pulse" />
+                  <span className="text-lg font-medium">Locating... verifying your position</span>
+                  <Loader2 className="h-5 w-5 text-info animate-spin" />
+                </>
+              ) : (
+                <>
+                  <Scan className="h-8 w-8 text-primary animate-pulse" />
+                  <span className="text-lg font-medium">Scanning for facial recognition...</span>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -464,8 +474,15 @@ export function StudentDashboard() {
                         className="text-center text-2xl tracking-widest"
                       />
                     </div>
-                    <Button className="w-full" onClick={handleCheckIn}>
-                      Submit
+                    <Button className="w-full gap-2" onClick={handleCheckIn} disabled={isLocating}>
+                      {isLocating ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Locating...
+                        </>
+                      ) : (
+                        "Submit"
+                      )}
                     </Button>
                   </div>
                 ) : (
