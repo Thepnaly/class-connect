@@ -521,20 +521,6 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
                         </div>
                       )}
                     </TableCell>
-                    {isCheckInActive && (
-                      <TableCell>
-                        {record.status === 'X' && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 text-xs"
-                            onClick={() => handleSimulateCheckIn(record.studentId)}
-                          >
-                            Simulate Check-in
-                          </Button>
-                        )}
-                      </TableCell>
-                    )}
                   </TableRow>
                 );
               })}
