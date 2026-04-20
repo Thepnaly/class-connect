@@ -9,9 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Play, Clock, Plus, StopCircle, FileSpreadsheet, FileText, MessageSquare, XCircle, Timer } from "lucide-react";
+import { ArrowLeft, Play, Clock, Plus, StopCircle, FileSpreadsheet, FileText, MessageSquare, XCircle, Timer, AlertTriangle, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cancelledClassesStore } from "@/lib/cancelledClasses";
 
 interface AttendanceRecord {
@@ -24,6 +25,8 @@ interface AttendanceRecord {
   checkInTime?: string;
   isDropped: boolean;
   note: string;
+  outOfBounds?: boolean;
+  distanceFromClass?: number; // in meters
 }
 
 interface DailyCheckInPageProps {
@@ -61,6 +64,8 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
   const [noteText, setNoteText] = useState("");
   const [isClassCancelled, setIsClassCancelled] = useState(cancelledClassesStore.isCancelled(classDateId));
   const [sessionNote, setSessionNote] = useState(""); // Class session notes
+  const [isStartingSession, setIsStartingSession] = useState(false);
+  const [sessionLocation, setSessionLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Countdown timer effect
@@ -112,15 +117,54 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
   };
 
   const handleStartCheckIn = () => {
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const checkInDuration = sessionDuration || duration;
-    setCheckInCode(code);
-    setIsCheckInActive(true);
-    setTimeRemaining(checkInDuration * 60);
-    toast({
-      title: "Check-in Started",
-      description: `Check-in code: ${code}. Duration: ${checkInDuration} minutes.`,
-    });
+    if (!navigator.geolocation) {
+      toast({
+        title: "Geolocation Not Supported",
+        description: "Location access is required to start the session. Please refresh the page and click 'Allow' when prompted, or enable location access for this site in your phone/browser settings.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsStartingSession(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setSessionLocation({ latitude, longitude });
+
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        const checkInDuration = sessionDuration || duration;
+        setCheckInCode(code);
+        setIsCheckInActive(true);
+        setTimeRemaining(checkInDuration * 60);
+        setIsStartingSession(false);
+
+        // Payload that would be sent to backend
+        console.log("Session start payload:", {
+          classDateId,
+          checkInCode: code,
+          duration: checkInDuration,
+          latitude,
+          longitude,
+        });
+
+        toast({
+          title: "Check-in Started",
+          description: `Code: ${code} • Duration: ${checkInDuration} min • Location captured.`,
+        });
+      },
+      (error) => {
+        setIsStartingSession(false);
+        toast({
+          title: "Location Access Required",
+          description: "Location access is required to start the session. Please refresh the page and click 'Allow' when prompted, or enable location access for this site in your phone/browser settings.",
+          variant: "destructive",
+        });
+        console.error("Geolocation error:", error);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
   };
 
   const handleEndCheckIn = useCallback(() => {
@@ -159,15 +203,25 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
   const handleSimulateCheckIn = (studentId: string) => {
     const now = new Date();
     const checkInTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
+
+    // Simulate ~30% of check-ins being out of bounds for demo
+    const outOfBounds = Math.random() < 0.3;
+    const distanceFromClass = outOfBounds
+      ? Math.round((500 + Math.random() * 4500)) // 500m - 5km
+      : Math.round(Math.random() * 40); // within radius
+
     setRecords((prev) =>
       prev.map((r) =>
-        r.studentId === studentId ? { ...r, status: 'O' as AttendanceStatus, checkInTime } : r
+        r.studentId === studentId
+          ? { ...r, status: 'O' as AttendanceStatus, checkInTime, outOfBounds, distanceFromClass }
+          : r
       )
     );
     toast({
       title: "Student Checked In",
-      description: `Student has been marked as Present.`,
+      description: outOfBounds
+        ? `Marked as Present (⚠ Out of bounds: ${(distanceFromClass / 1000).toFixed(2)} km).`
+        : `Student has been marked as Present.`,
     });
   };
 
@@ -276,9 +330,18 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
                     </div>
                   </DialogContent>
                 </Dialog>
-                <Button onClick={handleStartCheckIn} className="gap-2">
-                  <Play className="h-4 w-4" />
-                  Start Check-in
+                <Button onClick={handleStartCheckIn} className="gap-2" disabled={isStartingSession}>
+                  {isStartingSession ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4" />
+                      Start Check-in
+                    </>
+                  )}
                 </Button>
                 <Button 
                   variant="destructive" 
@@ -374,7 +437,44 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
                   <TableRow key={record.id} className={`table-row-hover ${rowClass}`}>
                     <TableCell className={`font-medium ${isSpecialStatus ? 'text-white' : ''}`}>{index + 1}</TableCell>
                     <TableCell className={isSpecialStatus ? 'text-white' : ''}>{record.studentCode}</TableCell>
-                    <TableCell className={isSpecialStatus ? 'text-white' : ''}>{record.studentName}</TableCell>
+                    <TableCell className={isSpecialStatus ? 'text-white' : ''}>
+                      <div className="flex items-center gap-2">
+                        <span>{record.studentName}</span>
+                        {record.outOfBounds && (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button
+                                type="button"
+                                className="inline-flex items-center justify-center rounded-full p-1 text-warning hover:bg-warning/10 transition-colors focus:outline-none focus:ring-2 focus:ring-warning"
+                                aria-label="Out of bounds check-in warning"
+                              >
+                                <AlertTriangle className="h-4 w-4 fill-warning/20" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-72 bg-popover border-warning/40">
+                              <div className="flex gap-3">
+                                <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+                                <div className="space-y-1">
+                                  <p className="font-semibold text-sm text-foreground">
+                                    Out of Bounds Check-in
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    Warning: This student checked in from a location outside the allowed classroom radius.
+                                  </p>
+                                  {record.distanceFromClass !== undefined && (
+                                    <p className="text-xs font-medium text-warning pt-1">
+                                      Distance: {record.distanceFromClass >= 1000
+                                        ? `${(record.distanceFromClass / 1000).toFixed(2)} km`
+                                        : `${record.distanceFromClass} m`} away
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <StatusBadge status={record.status} showLabel />
                     </TableCell>
