@@ -38,18 +38,25 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
   const classDate = classDates.find((d) => d.id === classDateId);
   const course = classDate ? courses.find((c) => c.id === classDate.courseId) : null;
   
-  // Initialize all students with Absent status by default
-  const initialRecords: AttendanceRecord[] = students.map((student, index) => ({
-    id: `${classDateId}-${student.id}`,
-    studentId: student.id,
-    studentCode: student.studentCode,
-    studentName: student.name,
-    classDateId: classDateId,
-    status: 'X' as AttendanceStatus, // Default to Absent
-    checkInTime: undefined,
-    isDropped: false,
-    note: '',
-  }));
+  // Initialize all students with Absent status by default.
+  // Pre-seed two students as Present but Out-of-Bounds so the teacher
+  // can immediately review the geolocation warning UI.
+  const initialRecords: AttendanceRecord[] = students.map((student, index) => {
+    const isDemoOutOfBounds = index === 1 || index === 3;
+    return {
+      id: `${classDateId}-${student.id}`,
+      studentId: student.id,
+      studentCode: student.studentCode,
+      studentName: student.name,
+      classDateId: classDateId,
+      status: (isDemoOutOfBounds ? 'O' : 'X') as AttendanceStatus,
+      checkInTime: isDemoOutOfBounds ? (index === 1 ? '09:05' : '09:08') : undefined,
+      isDropped: false,
+      note: '',
+      outOfBounds: isDemoOutOfBounds,
+      distanceFromClass: isDemoOutOfBounds ? (index === 1 ? 2500 : 850) : undefined,
+    };
+  });
   
   const [records, setRecords] = useState<AttendanceRecord[]>(initialRecords);
   const [isCheckInActive, setIsCheckInActive] = useState(classDate?.isActive || false);
@@ -66,7 +73,7 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
   const [sessionNote, setSessionNote] = useState(""); // Class session notes
   const [isStartingSession, setIsStartingSession] = useState(false);
   const [sessionLocation, setSessionLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Countdown timer effect
   useEffect(() => {
@@ -196,32 +203,6 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
     toast({
       title: "Status Updated",
       description: `Changed status to ${getStatusLabel(newStatus)}`,
-    });
-  };
-
-  // Simulate student check-in (for demo purposes)
-  const handleSimulateCheckIn = (studentId: string) => {
-    const now = new Date();
-    const checkInTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-    // Simulate ~30% of check-ins being out of bounds for demo
-    const outOfBounds = Math.random() < 0.3;
-    const distanceFromClass = outOfBounds
-      ? Math.round((500 + Math.random() * 4500)) // 500m - 5km
-      : Math.round(Math.random() * 40); // within radius
-
-    setRecords((prev) =>
-      prev.map((r) =>
-        r.studentId === studentId
-          ? { ...r, status: 'O' as AttendanceStatus, checkInTime, outOfBounds, distanceFromClass }
-          : r
-      )
-    );
-    toast({
-      title: "Student Checked In",
-      description: outOfBounds
-        ? `Marked as Present (⚠ Out of bounds: ${(distanceFromClass / 1000).toFixed(2)} km).`
-        : `Student has been marked as Present.`,
     });
   };
 
