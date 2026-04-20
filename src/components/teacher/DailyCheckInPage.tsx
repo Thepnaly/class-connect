@@ -117,15 +117,54 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
   };
 
   const handleStartCheckIn = () => {
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const checkInDuration = sessionDuration || duration;
-    setCheckInCode(code);
-    setIsCheckInActive(true);
-    setTimeRemaining(checkInDuration * 60);
-    toast({
-      title: "Check-in Started",
-      description: `Check-in code: ${code}. Duration: ${checkInDuration} minutes.`,
-    });
+    if (!navigator.geolocation) {
+      toast({
+        title: "Geolocation Not Supported",
+        description: "Location access is required to start the session. Please refresh the page and click 'Allow' when prompted, or enable location access for this site in your phone/browser settings.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsStartingSession(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setSessionLocation({ latitude, longitude });
+
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        const checkInDuration = sessionDuration || duration;
+        setCheckInCode(code);
+        setIsCheckInActive(true);
+        setTimeRemaining(checkInDuration * 60);
+        setIsStartingSession(false);
+
+        // Payload that would be sent to backend
+        console.log("Session start payload:", {
+          classDateId,
+          checkInCode: code,
+          duration: checkInDuration,
+          latitude,
+          longitude,
+        });
+
+        toast({
+          title: "Check-in Started",
+          description: `Code: ${code} • Duration: ${checkInDuration} min • Location captured.`,
+        });
+      },
+      (error) => {
+        setIsStartingSession(false);
+        toast({
+          title: "Location Access Required",
+          description: "Location access is required to start the session. Please refresh the page and click 'Allow' when prompted, or enable location access for this site in your phone/browser settings.",
+          variant: "destructive",
+        });
+        console.error("Geolocation error:", error);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
   };
 
   const handleEndCheckIn = useCallback(() => {
