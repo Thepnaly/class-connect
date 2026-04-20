@@ -437,7 +437,44 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
                   <TableRow key={record.id} className={`table-row-hover ${rowClass}`}>
                     <TableCell className={`font-medium ${isSpecialStatus ? 'text-white' : ''}`}>{index + 1}</TableCell>
                     <TableCell className={isSpecialStatus ? 'text-white' : ''}>{record.studentCode}</TableCell>
-                    <TableCell className={isSpecialStatus ? 'text-white' : ''}>{record.studentName}</TableCell>
+                    <TableCell className={isSpecialStatus ? 'text-white' : ''}>
+                      <div className="flex items-center gap-2">
+                        <span>{record.studentName}</span>
+                        {record.outOfBounds && (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button
+                                type="button"
+                                className="inline-flex items-center justify-center rounded-full p-1 text-warning hover:bg-warning/10 transition-colors focus:outline-none focus:ring-2 focus:ring-warning"
+                                aria-label="Out of bounds check-in warning"
+                              >
+                                <AlertTriangle className="h-4 w-4 fill-warning/20" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-72 bg-popover border-warning/40">
+                              <div className="flex gap-3">
+                                <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+                                <div className="space-y-1">
+                                  <p className="font-semibold text-sm text-foreground">
+                                    Out of Bounds Check-in
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    Warning: This student checked in from a location outside the allowed classroom radius.
+                                  </p>
+                                  {record.distanceFromClass !== undefined && (
+                                    <p className="text-xs font-medium text-warning pt-1">
+                                      Distance: {record.distanceFromClass >= 1000
+                                        ? `${(record.distanceFromClass / 1000).toFixed(2)} km`
+                                        : `${record.distanceFromClass} m`} away
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <StatusBadge status={record.status} showLabel />
                     </TableCell>
