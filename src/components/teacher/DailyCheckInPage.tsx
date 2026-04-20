@@ -330,9 +330,18 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
                     </div>
                   </DialogContent>
                 </Dialog>
-                <Button onClick={handleStartCheckIn} className="gap-2">
-                  <Play className="h-4 w-4" />
-                  Start Check-in
+                <Button onClick={handleStartCheckIn} className="gap-2" disabled={isStartingSession}>
+                  {isStartingSession ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4" />
+                      Start Check-in
+                    </>
+                  )}
                 </Button>
                 <Button 
                   variant="destructive" 
