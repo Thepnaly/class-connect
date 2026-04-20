@@ -406,7 +406,6 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
                 <TableHead>Drop/Withdraw</TableHead>
                 <TableHead>Edit</TableHead>
                 <TableHead>Note</TableHead>
-                {isCheckInActive && <TableHead>Action</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -426,10 +425,13 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
                             <PopoverTrigger asChild>
                               <button
                                 type="button"
-                                className="inline-flex items-center justify-center rounded-full p-1 text-warning hover:bg-warning/10 transition-colors focus:outline-none focus:ring-2 focus:ring-warning"
+                                className="inline-flex items-center gap-1 rounded-md border border-warning/40 bg-warning/10 px-1.5 py-0.5 text-warning hover:bg-warning/20 transition-colors focus:outline-none focus:ring-2 focus:ring-warning"
                                 aria-label="Out of bounds check-in warning"
                               >
-                                <AlertTriangle className="h-4 w-4 fill-warning/20" />
+                                <AlertTriangle className="h-3.5 w-3.5 fill-warning/20" />
+                                <span className="text-[11px] font-semibold leading-none">
+                                  Out of range
+                                </span>
                               </button>
                             </PopoverTrigger>
                             <PopoverContent className="w-72 bg-popover border-warning/40">
