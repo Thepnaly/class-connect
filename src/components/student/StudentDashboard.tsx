@@ -148,23 +148,33 @@ export function StudentDashboard() {
   const hasClassToday = todaySchedule.length > 0;
   const ongoingClass = todaySchedule.find((s) => s.isOngoing);
 
-  const handleCheckIn = () => {
-    if (checkInCode === "123456") {
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-      setCheckInTime(timeStr);
-      setCheckInSuccess(true);
-      toast({
-        title: "Check-in Successful!",
-        description: `You checked in at ${timeStr}`,
-      });
-    } else {
+  const handleCheckIn = async () => {
+    if (checkInCode !== "123456") {
       toast({
         title: "Invalid Code",
         description: "Please enter the correct 6-digit code from your teacher.",
         variant: "destructive",
       });
+      return;
     }
+
+    // Mandatory geolocation before submitting the code to the backend
+    const coords = await requestLocation();
+    if (!coords) return;
+
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+    setCheckInTime(timeStr);
+    setCheckInSuccess(true);
+    console.log("Manual check-in payload:", {
+      method: "code",
+      code: checkInCode,
+      ...coords,
+    });
+    toast({
+      title: "Check-in Successful!",
+      description: `You checked in at ${timeStr}`,
+    });
   };
 
   const resetCheckIn = () => {
