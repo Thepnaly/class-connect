@@ -10,7 +10,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Calendar, CheckCircle2, History, Clock, AlertCircle, Scan, Sparkles, User, Filter, XCircle, Ban } from "lucide-react";
+import { BookOpen, Calendar, CheckCircle2, History, Clock, AlertCircle, Scan, Sparkles, User, Filter, XCircle, Ban, Loader2, MapPin } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cancelledClassesStore, CancelledClass } from "@/lib/cancelledClasses";
 
@@ -43,6 +43,8 @@ export function StudentDashboard() {
   const [checkInTime, setCheckInTime] = useState("");
   const [aiCheckInSuccess, setAiCheckInSuccess] = useState(false);
   const [showAiAnimation, setShowAiAnimation] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
+  const [studentLocation, setStudentLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   
   // Archive filters
   const [selectedArchiveYear, setSelectedArchiveYear] = useState("2024");
