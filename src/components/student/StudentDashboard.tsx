@@ -10,7 +10,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Calendar, CheckCircle2, History, Clock, AlertCircle, Scan, Sparkles, User, Filter, XCircle, Ban } from "lucide-react";
+import { BookOpen, Calendar, CheckCircle2, History, Clock, AlertCircle, Scan, Sparkles, User, Filter, XCircle, Ban, Loader2, MapPin } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cancelledClassesStore, CancelledClass } from "@/lib/cancelledClasses";
 
@@ -43,6 +43,8 @@ export function StudentDashboard() {
   const [checkInTime, setCheckInTime] = useState("");
   const [aiCheckInSuccess, setAiCheckInSuccess] = useState(false);
   const [showAiAnimation, setShowAiAnimation] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
+  const [studentLocation, setStudentLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   
   // Archive filters
   const [selectedArchiveYear, setSelectedArchiveYear] = useState("2024");
@@ -64,16 +66,61 @@ export function StudentDashboard() {
   const currentDay = getDayName();
   const currentHour = getCurrentHour();
 
+  // Helper: request browser geolocation. Returns coordinates on success,
+  // or null on denial / failure (and shows an error toast).
+  const requestLocation = (): Promise<{ latitude: number; longitude: number } | null> => {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        toast({
+          title: "Location Unavailable",
+          description: "Attendance cannot be recorded without location access. Please enable GPS and try again.",
+          variant: "destructive",
+        });
+        resolve(null);
+        return;
+      }
+      setIsLocating(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setIsLocating(false);
+          const coords = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          };
+          setStudentLocation(coords);
+          resolve(coords);
+        },
+        () => {
+          setIsLocating(false);
+          toast({
+            title: "Location Access Denied",
+            description: "Attendance cannot be recorded without location access. Please enable GPS and try again.",
+            variant: "destructive",
+          });
+          resolve(null);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+      );
+    });
+  };
+
   // Simulate AI detection after 3 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!aiCheckInSuccess && !checkInSuccess) {
         setShowAiAnimation(true);
-        setTimeout(() => {
+        setTimeout(async () => {
+          // Require GPS before confirming AI check-in
+          const coords = await requestLocation();
+          if (!coords) {
+            setShowAiAnimation(false);
+            return;
+          }
           setAiCheckInSuccess(true);
+          console.log("AI check-in payload:", { method: "face", ...coords });
           toast({
             title: "AI Check-in Successful!",
-            description: "Face recognized and verified automatically.",
+            description: "Face recognized and location verified.",
           });
         }, 2000);
       }
@@ -101,23 +148,33 @@ export function StudentDashboard() {
   const hasClassToday = todaySchedule.length > 0;
   const ongoingClass = todaySchedule.find((s) => s.isOngoing);
 
-  const handleCheckIn = () => {
-    if (checkInCode === "123456") {
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-      setCheckInTime(timeStr);
-      setCheckInSuccess(true);
-      toast({
-        title: "Check-in Successful!",
-        description: `You checked in at ${timeStr}`,
-      });
-    } else {
+  const handleCheckIn = async () => {
+    if (checkInCode !== "123456") {
       toast({
         title: "Invalid Code",
         description: "Please enter the correct 6-digit code from your teacher.",
         variant: "destructive",
       });
+      return;
     }
+
+    // Mandatory geolocation before submitting the code to the backend
+    const coords = await requestLocation();
+    if (!coords) return;
+
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+    setCheckInTime(timeStr);
+    setCheckInSuccess(true);
+    console.log("Manual check-in payload:", {
+      method: "code",
+      code: checkInCode,
+      ...coords,
+    });
+    toast({
+      title: "Check-in Successful!",
+      description: `You checked in at ${timeStr}`,
+    });
   };
 
   const resetCheckIn = () => {
@@ -183,8 +240,18 @@ export function StudentDashboard() {
         {showAiAnimation && !aiCheckInSuccess && (
           <div className="bg-gradient-to-r from-primary/20 via-info/20 to-primary/20 rounded-xl p-6 border border-primary/30 animate-pulse">
             <div className="flex items-center justify-center gap-3">
-              <Scan className="h-8 w-8 text-primary animate-pulse" />
-              <span className="text-lg font-medium">Scanning for facial recognition...</span>
+              {isLocating ? (
+                <>
+                  <MapPin className="h-8 w-8 text-info animate-pulse" />
+                  <span className="text-lg font-medium">Locating... verifying your position</span>
+                  <Loader2 className="h-5 w-5 text-info animate-spin" />
+                </>
+              ) : (
+                <>
+                  <Scan className="h-8 w-8 text-primary animate-pulse" />
+                  <span className="text-lg font-medium">Scanning for facial recognition...</span>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -407,8 +474,15 @@ export function StudentDashboard() {
                         className="text-center text-2xl tracking-widest"
                       />
                     </div>
-                    <Button className="w-full" onClick={handleCheckIn}>
-                      Submit
+                    <Button className="w-full gap-2" onClick={handleCheckIn} disabled={isLocating}>
+                      {isLocating ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Locating...
+                        </>
+                      ) : (
+                        "Submit"
+                      )}
                     </Button>
                   </div>
                 ) : (
