@@ -66,16 +66,61 @@ export function StudentDashboard() {
   const currentDay = getDayName();
   const currentHour = getCurrentHour();
 
+  // Helper: request browser geolocation. Returns coordinates on success,
+  // or null on denial / failure (and shows an error toast).
+  const requestLocation = (): Promise<{ latitude: number; longitude: number } | null> => {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        toast({
+          title: "Location Unavailable",
+          description: "Attendance cannot be recorded without location access. Please enable GPS and try again.",
+          variant: "destructive",
+        });
+        resolve(null);
+        return;
+      }
+      setIsLocating(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setIsLocating(false);
+          const coords = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          };
+          setStudentLocation(coords);
+          resolve(coords);
+        },
+        () => {
+          setIsLocating(false);
+          toast({
+            title: "Location Access Denied",
+            description: "Attendance cannot be recorded without location access. Please enable GPS and try again.",
+            variant: "destructive",
+          });
+          resolve(null);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+      );
+    });
+  };
+
   // Simulate AI detection after 3 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!aiCheckInSuccess && !checkInSuccess) {
         setShowAiAnimation(true);
-        setTimeout(() => {
+        setTimeout(async () => {
+          // Require GPS before confirming AI check-in
+          const coords = await requestLocation();
+          if (!coords) {
+            setShowAiAnimation(false);
+            return;
+          }
           setAiCheckInSuccess(true);
+          console.log("AI check-in payload:", { method: "face", ...coords });
           toast({
             title: "AI Check-in Successful!",
-            description: "Face recognized and verified automatically.",
+            description: "Face recognized and location verified.",
           });
         }, 2000);
       }
