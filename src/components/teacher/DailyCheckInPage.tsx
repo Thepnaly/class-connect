@@ -203,15 +203,25 @@ export function DailyCheckInPage({ classDateId, onBack }: DailyCheckInPageProps)
   const handleSimulateCheckIn = (studentId: string) => {
     const now = new Date();
     const checkInTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
+
+    // Simulate ~30% of check-ins being out of bounds for demo
+    const outOfBounds = Math.random() < 0.3;
+    const distanceFromClass = outOfBounds
+      ? Math.round((500 + Math.random() * 4500)) // 500m - 5km
+      : Math.round(Math.random() * 40); // within radius
+
     setRecords((prev) =>
       prev.map((r) =>
-        r.studentId === studentId ? { ...r, status: 'O' as AttendanceStatus, checkInTime } : r
+        r.studentId === studentId
+          ? { ...r, status: 'O' as AttendanceStatus, checkInTime, outOfBounds, distanceFromClass }
+          : r
       )
     );
     toast({
       title: "Student Checked In",
-      description: `Student has been marked as Present.`,
+      description: outOfBounds
+        ? `Marked as Present (⚠ Out of bounds: ${(distanceFromClass / 1000).toFixed(2)} km).`
+        : `Student has been marked as Present.`,
     });
   };
 
