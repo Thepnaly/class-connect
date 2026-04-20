@@ -9,9 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Play, Clock, Plus, StopCircle, FileSpreadsheet, FileText, MessageSquare, XCircle, Timer } from "lucide-react";
+import { ArrowLeft, Play, Clock, Plus, StopCircle, FileSpreadsheet, FileText, MessageSquare, XCircle, Timer, AlertTriangle, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cancelledClassesStore } from "@/lib/cancelledClasses";
 
 interface AttendanceRecord {
@@ -24,6 +25,8 @@ interface AttendanceRecord {
   checkInTime?: string;
   isDropped: boolean;
   note: string;
+  outOfBounds?: boolean;
+  distanceFromClass?: number; // in meters
 }
 
 interface DailyCheckInPageProps {
